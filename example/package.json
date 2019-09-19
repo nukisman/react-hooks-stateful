@@ -5,11 +5,11 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "prettier": "^1.18.2",
     "prop-types": "^15.7.2",
     "react-dep-state": "link:.."
   },
   "devDependencies": {
+    "prettier": "^1.18.2",
     "@types/jest": "^24.0.18",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
