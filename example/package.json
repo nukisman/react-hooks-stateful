@@ -5,7 +5,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "prop-types": "^15.7.2",
     "react-dep-state": "link:.."
   },
   "devDependencies": {
@@ -13,14 +12,17 @@
     "@types/jest": "^24.0.18",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
-    "react-scripts-ts": "^3.1.0"
+    "react-scripts-ts": "^3.1.0",
+    "rollup-plugin-tslint": "^0.2.2",
+    "tslint-react": "^4.1.0",
+    "tslint-react-hooks": "^2.2.1"
   },
   "peerDependencies": {
     "react": "^16.9.0",
     "react-dom": "^16.9.0"
   },
   "scripts": {
-    "start": "react-scripts-ts start",
+    "start": "PORT=3002 react-scripts-ts start",
     "build": "react-scripts-ts build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"

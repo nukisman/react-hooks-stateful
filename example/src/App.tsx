@@ -1,13 +1,17 @@
-import React, { Component } from 'react';
+import React, { FC, useState } from 'react';
 
 import ExampleComponent from 'react-dep-state';
 
-export default class App extends Component {
-  render() {
-    return (
-      <div>
-        <ExampleComponent text="Rollup TypeScript React component module" />
-      </div>
-    );
-  }
-}
+const App: FC = () => {
+  const [s] = useState(1);
+  // const f = () => {
+  //   const [x] = useState(1);
+  // };
+  return (
+    <div>
+      <ExampleComponent text="Rollup TypeScript TSLint React component module" />
+    </div>
+  );
+};
+
+export default App;

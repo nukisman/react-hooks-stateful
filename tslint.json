@@ -1,0 +1,14 @@
+{
+  "extends": ["tslint:latest", "tslint-react", "tslint-react-hooks"],
+  "rules": {
+    "quotemark": [true, "single", "jsx-double"],
+    "no-var-requires": false,
+    "interface-over-type-literal": false,
+    "react-hooks-nesting": {
+      "severity": "error", // "error", "warning", "default" or "off"
+      "options": {
+        "detect-hooks-from-non-react-namespace": true
+      }
+    }
+  }
+}
