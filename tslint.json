@@ -1,8 +1,12 @@
 {
   "extends": ["tslint:latest", "tslint-react", "tslint-react-hooks"],
+  "linterOptions": {
+    "exclude": ["src/*.css"]
+  },
   "rules": {
     "quotemark": [true, "single", "jsx-double"],
     "no-var-requires": false,
+    "no-implicit-dependencies": false,
     "interface-over-type-literal": false,
     "react-hooks-nesting": {
       "severity": "error", // "error", "warning", "default" or "off"
