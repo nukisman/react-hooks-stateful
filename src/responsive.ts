@@ -2,29 +2,40 @@
 import React, { useEffect } from 'react';
 import { State, useDepState2, useInState, useLte } from './main';
 
-// export const ResponsivePropTypes = {};
-//
-// ResponsivePropTypes.depWidth = StatePropTypes.depState(
-//   PropTypes.number.isRequired
-// );
-export const useDepWidth: () => State<number> = () => {
-  const width = useInState(window.innerWidth);
+type Size = { width: number; height: number };
+const getSize = (): Size => ({
+  width: window.innerWidth,
+  height: window.innerHeight
+});
+
+export const useWindowSize: () => State<Size> = () => {
+  const size = useInState(getSize);
   useEffect(() => {
     const listen = () => {
-      width.set(window.innerWidth);
+      size.set(getSize());
     };
     window.addEventListener('resize', listen);
     return () => window.removeEventListener('resize', listen);
   }, []);
-  return { state: width.state };
+  return { state: size.state };
 };
+
+// todo: useWindowWidth = () => useProp('width', useWindowSize())
+export const useWindowWidth: () => State<number> = () => ({
+  state: useWindowSize().state.width
+});
+
+// todo: useWindowHeight = () => useProp('height', useWindowSize())
+export const useWindowHeight: () => State<number> = () => ({
+  state: useWindowSize().state.height
+});
 
 // ResponsivePropTypes.depMobile = DepPropTypes.depState(
 //   PropTypes.bool.isRequired
 // );
 export const useDepMobile: (
   threshold: State<number>
-) => State<boolean> = threshold => useLte(useDepWidth(), threshold);
+) => State<boolean> = threshold => useLte(useWindowWidth(), threshold);
 
 // ResponsivePropTypes.depWidthLevels = DepPropTypes.depState(
 //   PropTypes.arrayOf(PropTypes.bool.isRequired).isRequired
@@ -32,7 +43,7 @@ export const useDepMobile: (
 export const useDepWidthLevels: (
   threshold: State<number[]>
 ) => State<boolean[]> = levels => {
-  const width = useDepWidth();
+  const width = useWindowWidth();
   return useDepState2<number, number[], boolean[]>(
     width,
     levels,
