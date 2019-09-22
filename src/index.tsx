@@ -15,7 +15,7 @@ const ExampleComponent: FC<Props> = ({ text }) => {
   //   const [x] = useState(1);
   // };
   // return <div className="test">Example Component 7: {text}</div>;
-  return <div className={styles.test}>Example Component 6: {text}</div>;
+  return <div className={styles.test}>Example Component 7: {text}</div>;
 };
 
 export default ExampleComponent;

@@ -8,9 +8,7 @@ const App: FC = () => {
   //   const [x] = useState(1);
   // };
   return (
-    <div>
-      <ExampleComponent text="Rollup TypeScript TSLint React component module" />
-    </div>
+    <ExampleComponent text="Rollup TypeScript TSLint React component module" />
   );
 };
 
