@@ -35,7 +35,6 @@ export default {
     url(),
     svgr(),
     resolve(),
-    // resolve({ dedupe: ['react', 'react-dom'] }),
     tslint({}),
     typescript({
       rollupCommonJSResolveHack: true,
