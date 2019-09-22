@@ -5,14 +5,19 @@
   "author": "nukisman",
   "license": "MIT",
   "repository": "nukisman/react-dep-state",
-  "main": "dist/index.js",
-  "module": "dist/index.es.js",
-  "jsnext:main": "dist/index.es.js",
+  "main": "main/index.js",
+  "files": [
+    "main",
+    "responsive"
+  ],
   "engines": {
     "node": ">=8",
     "npm": ">=5"
   },
   "scripts": {
+    "tslint-fix": "npx tslint --project . --fix",
+    "prestart": "yarn run tslint-fix",
+    "pretest": "yarn run tslint-fix",
     "test": "cross-env CI=1 react-scripts-ts test --env=jsdom",
     "test:watch": "react-scripts-ts test --env=jsdom",
     "build": "rollup -c",
@@ -21,7 +26,11 @@
     "predeploy": "cd example && yarn install && yarn run build",
     "deploy": "gh-pages -d example/build"
   },
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "reupdate": "^1.12.0",
+    "stringify-object": "^3.3.0"
+  },
   "peerDependencies": {
     "react": "^16.9.0",
     "react-dom": "^16.9.0"
@@ -29,12 +38,16 @@
   "devDependencies": {
     "@svgr/rollup": "^4.3.2",
     "@types/jest": "^24.0.18",
+    "@types/lodash": "^4.14.138",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
     "babel-core": "^6.26.3",
     "babel-runtime": "^6.26.0",
     "cross-env": "^6.0.0",
     "gh-pages": "^2.1.1",
+    "gulp": "^4.0.2",
+    "gulp-rename": "^1.4.0",
+    "gulp-rm": "^2.0.0",
     "prettier": "^1.18.2",
     "react-scripts-ts": "^3.1.0",
     "rollup": "^1.21.4",
@@ -49,8 +62,5 @@
     "tslint-react": "^4.1.0",
     "tslint-react-hooks": "^2.2.1",
     "typescript": "^3.6.3"
-  },
-  "files": [
-    "dist"
-  ]
+  }
 }

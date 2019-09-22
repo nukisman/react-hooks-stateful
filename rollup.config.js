@@ -10,36 +10,32 @@ import svgr from '@svgr/rollup';
 
 import pkg from './package.json';
 
-export default {
-  input: 'src/index.tsx',
-  output: [
-    {
-      file: pkg.main,
-      format: 'cjs',
-      exports: 'named',
-      sourcemap: true
-    },
-    {
-      file: pkg.module,
-      format: 'es',
-      exports: 'named',
-      sourcemap: true
-    }
-  ],
-  plugins: [
-    external(),
+const modules = pkg.files;
 
-    postcss({
-      modules: true
-    }),
-    url(),
-    svgr(),
-    resolve(),
-    tslint({}),
-    typescript({
-      rollupCommonJSResolveHack: true,
-      clean: true
-    }),
-    commonjs()
-  ]
-};
+const plugins = [
+  external(),
+
+  postcss({
+    modules: true
+  }),
+  url(),
+  svgr(),
+  tslint({}),
+  typescript({
+    rollupCommonJSResolveHack: true,
+    clean: true
+  }),
+  resolve({ modules: true }),
+  commonjs()
+];
+
+export default modules.map(name => ({
+  input: { index: `src/${name}.ts` },
+  output: {
+    dir: name,
+    format: 'cjs',
+    exports: 'named',
+    sourcemap: true
+  },
+  plugins
+}));

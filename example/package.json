@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "react-dep-state": "link:.."
+    "react-dep-state": "link:../"
   },
   "devDependencies": {
     "@types/jest": "^24.0.18",
@@ -14,15 +14,15 @@
     "prettier": "^1.18.2",
     "react-scripts-ts": "^3.1.0",
     "tslint-react": "^4.1.0",
-    "tslint-react-hooks": "^2.2.1"
+    "tslint-react-hooks": "^2.2.1",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0"
   },
   "peerDependencies": {
-    "react": "link:../node_modules/react",
-    "react-dom": "link:../node_modules/react"
   },
   "scripts": {
-    "start": "PORT=3002 react-scripts-ts start",
-    "build": "react-scripts-ts build",
+    "start": "PORT=3002 react-scripts-ts --max_old_space_size=4096 start",
+    "build": "react-scripts-ts --max_old_space_size=4096 build",
     "test": "react-scripts-ts test --env=jsdom",
     "eject": "react-scripts-ts eject"
   }
