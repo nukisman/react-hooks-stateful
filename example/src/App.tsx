@@ -11,6 +11,7 @@ const App: FC = () => {
     name.set(e.target.value);
   return (
     <>
+      <h4>Example: react-dep-state</h4>
       <input defaultValue={name.state} onChange={updateName} />
       <div>name: {name.state}</div>
       <div>
