@@ -15,14 +15,15 @@
     "npm": ">=5"
   },
   "scripts": {
-    "tslint-fix": "yarn tslint --project . --fix",
-    "prestart": "yarn run tslint-fix",
-    "pretest": "yarn run tslint-fix",
+    "lint": "yarn eslint-check && yarn eslint",
+    "eslint": "eslint --ext=js,jsx,ts,tsx --ignore-pattern '!.eslintrc.js' ./*.js ./.*.js src example/src",
+    "eslint-check": "eslint --print-config path/to/main.js | eslint-config-prettier-check",
+    "prestart": "yarn run lint --fix",
+    "pretest": "yarn run lint --fix",
     "test": "cross-env CI=1 react-scripts-ts test --env=jsdom",
     "test:watch": "react-scripts-ts test --env=jsdom",
     "build": "rollup -c",
     "start": "rollup -c -w",
-    "prepare": "yarn run build",
     "predeploy": "cd example && yarn install && yarn run build",
     "deploy": "gh-pages -d example/build"
   },
@@ -32,8 +33,8 @@
     "stringify-object": "^3.3.0"
   },
   "peerDependencies": {
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0"
+    "react": "^16.10.1",
+    "react-dom": "^16.10.1"
   },
   "devDependencies": {
     "@svgr/rollup": "^4.3.2",
@@ -41,26 +42,30 @@
     "@types/lodash": "^4.14.138",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
+    "@typescript-eslint/eslint-plugin": "^2.3.1",
+    "@typescript-eslint/parser": "^2.3.1",
     "babel-core": "^6.26.3",
     "babel-runtime": "^6.26.0",
     "cross-env": "^6.0.0",
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.14.3",
     "gh-pages": "^2.1.1",
     "gulp": "^4.0.2",
     "gulp-rename": "^1.4.0",
     "gulp-rm": "^2.0.0",
     "prettier": "^1.18.2",
-    "react-scripts-ts": "^3.1.0",
+    "react-scripts": "^3.1.2",
     "rollup": "^1.21.4",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-eslint": "^7.0.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-peer-deps-external": "^2.2.0",
     "rollup-plugin-postcss": "^2.0.3",
-    "rollup-plugin-tslint": "^0.2.2",
     "rollup-plugin-typescript2": "^0.24.2",
     "rollup-plugin-url": "^2.2.2",
-    "tslint-react": "^4.1.0",
-    "tslint-react-hooks": "^2.2.1",
     "typescript": "^3.6.3"
   }
 }

@@ -1,5 +1,5 @@
 import typescript from 'rollup-plugin-typescript2';
-import tslint from 'rollup-plugin-tslint';
+import { eslint } from 'rollup-plugin-eslint';
 import commonjs from 'rollup-plugin-commonjs';
 import external from 'rollup-plugin-peer-deps-external';
 // import postcss from 'rollup-plugin-postcss-modules'
@@ -20,7 +20,7 @@ const plugins = [
   }),
   url(),
   svgr(),
-  tslint({}),
+  eslint({}),
   typescript({
     rollupCommonJSResolveHack: true,
     clean: true

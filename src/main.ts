@@ -191,18 +191,14 @@ export const useDepState2 = <D1, D2, S>(
  * *******************************************************/
 export const createUno = <A, R>(compute: (a: A) => R) => (
   a: State<A>
-): State<R> => {
-  // tslint:disable-next-line:react-hooks-nesting
-  return useDepState(a, compute);
-};
+): State<R> => useDepState(a, compute);
 
 export const createBin = <A, B, R>(compute: (a: A, b: B) => R) => (
   a: State<A>,
   b: State<B>
-): State<R> => {
+): State<R> =>
   // tslint:disable-next-line:react-hooks-nesting
-  return useDepState2(a, b, compute);
-};
+  useDepState2(a, b, compute);
 
 export const useEq = createBin((a: any, b: any) => a === b);
 
