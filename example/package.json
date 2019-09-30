@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext=js,jsx,ts,tsx --ignore-pattern '!.eslintrc.js' ./*.js ./.*.js src",
+    "lint": "eslint --ext=js,jsx,ts,tsx --ignore-pattern '!.eslintrc.js' .",
     "prestart": "yarn run lint --fix",
     "pretest": "yarn run lint --fix",
     "start": "PORT=3002 react-scripts --max_old_space_size=4096 start",
@@ -26,7 +26,7 @@
     ]
   },
   "dependencies": {
-    "react-dep-state": "link:../"
+    "react-dep-state": "^1.0.0"
   },
   "peerDependencies": {},
   "devDependencies": {

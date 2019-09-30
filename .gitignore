@@ -1,6 +1,7 @@
 /.idea/
 
 /example/node_modules/
+/example/node_modules/react-dep-state/
 /example/build/
 
 /lib/build/
