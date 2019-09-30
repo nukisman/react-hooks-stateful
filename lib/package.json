@@ -15,9 +15,7 @@
     "npm": ">=5"
   },
   "scripts": {
-    "lint": "yarn eslint-check && yarn eslint",
-    "eslint": "eslint --ext=js,jsx,ts,tsx --ignore-pattern '!.eslintrc.js' ./*.js ./.*.js src example/src",
-    "eslint-check": "eslint --print-config path/to/main.js | eslint-config-prettier-check",
+    "lint": "eslint --ext=js,jsx,ts,tsx --ignore-pattern '!.eslintrc.js' ./*.js ./.*.js src",
     "prestart": "yarn run lint --fix",
     "pretest": "yarn run lint --fix",
     "test": "cross-env CI=1 react-scripts test --env=jsdom",
@@ -42,13 +40,14 @@
     "@types/lodash": "^4.14.138",
     "@types/react": "^16.9.2",
     "@types/react-dom": "^16.9.0",
-    "@typescript-eslint/eslint-plugin": "^2.3.1",
-    "@typescript-eslint/parser": "^2.3.1",
+    "@typescript-eslint/eslint-plugin": "^2.3.2",
+    "@typescript-eslint/parser": "^2.3.2",
     "babel-core": "^6.26.3",
     "babel-runtime": "^6.26.0",
     "cross-env": "^6.0.0",
-    "eslint": "^6.4.0",
+    "eslint": "^6.5.0",
     "eslint-config-prettier": "^6.3.0",
+    "eslint-config-react-app": "^5.0.2",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-react": "^7.14.3",
     "gh-pages": "^2.1.1",
@@ -66,6 +65,7 @@
     "rollup-plugin-postcss": "^2.0.3",
     "rollup-plugin-typescript2": "^0.24.2",
     "rollup-plugin-url": "^2.2.2",
+    "shelljs": "^0.8.3",
     "typescript": "^3.6.3"
   }
 }

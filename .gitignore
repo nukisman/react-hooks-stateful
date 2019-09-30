@@ -1,8 +1,9 @@
-/node_modules/
-/build/
-/dist/
+/.idea/
+
 /example/node_modules/
 /example/build/
-/.idea/
-/main/
-/responsive/
+
+/lib/build/
+/lib/main/
+/lib/responsive/
+/lib/node_modules/

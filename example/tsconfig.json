@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig",
+  "extends": "../lib/tsconfig",
   "compilerOptions": {
     "declaration": false,
     "allowUnusedLabels": true,

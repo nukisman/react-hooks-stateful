@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "build",
+    "outDir": "./build",
     "module": "esnext",
     "target": "es5",
     "lib": [
@@ -30,9 +30,9 @@
   ],
   "exclude": [
     "node_modules",
-    "build",
+    "./build",
     "dist",
     "example",
-    "rollup.config.js"
+    "lib/rollup.config.js"
   ]
 }
