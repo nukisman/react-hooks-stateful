@@ -15,7 +15,8 @@
     "npm": ">=5"
   },
   "scripts": {
-    "lint": "eslint --ext=js,jsx,ts,tsx --ignore-pattern '!.eslintrc.js' .",
+    "lint": "yarn lint-file .",
+    "lint-file": "eslint --ext=js,jsx,ts,tsx --ignore-pattern '!.eslintrc.js'",
     "prestart": "yarn run lint --fix",
     "pretest": "yarn run lint --fix",
     "test": "cross-env CI=1 react-scripts test --env=jsdom",
