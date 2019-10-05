@@ -29,15 +29,28 @@ export const useXor = reuse2((a, b) => (a && !b) || (!a && b));
 // todo: Bitwise operators
 
 /** JS Operators hooks: object property */
-export const reuseProp = <K extends keyof T, T>(name: State<K>) => (
+export const reuseProp = <K extends string>(name: State<K>) => <
+  S,
+  T extends { [P in K]: S } = { [P in K]: S }
+>(
   obj: State<T>
-): State<T[K]> =>
+): State<S> =>
   useDepState2<K, T, T[K]>(name, obj, (name: K, obj: T) => obj[name]);
 
-export const useProp = <K extends keyof T, T>(
+export const reusePropOf = <K extends string>(name: State<K>) => <S>() => <
+  T extends { [P in K]: S } = { [P in K]: S }
+>(
+  obj: State<T>
+): State<S> => reuseProp<K>(name)<S, T>(obj);
+
+export const useProp = <
+  K extends string,
+  S,
+  T extends { [P in K]: S } = { [P in K]: S }
+>(
   name: State<K>,
   obj: State<T>
-): State<T[K]> =>
+): State<S> =>
   useDepState2<K, T, T[K]>(name, obj, (name: K, obj: T) => obj[name]);
 
 /** Spread objects */

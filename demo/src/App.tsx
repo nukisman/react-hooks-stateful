@@ -2,25 +2,35 @@ import React, { ChangeEvent, FC } from 'react';
 
 import { useInState } from 'react-dep-state';
 
-import { useWindowSize, Size } from 'react-dep-state/responsive';
-import { constState } from 'react-dep-state/main';
+import { useWindowSize } from 'react-dep-state/responsive';
+import { constState, State } from 'react-dep-state/main';
 import {
   useProp,
   useString,
   useSum,
   useProd,
-  reuseProp
+  reuseProp,
+  reusePropOf
 } from 'react-dep-state/operator';
 
-const useWidth = reuseProp<'width', Size>(constState('width'));
+/** Width of some type defined later */
+const useWidth = reuseProp(constState('width'));
+
+/** Width of number */
+const useWidthOfNumber = reusePropOf(constState('width'))<number>();
 
 const App: FC = () => {
   const name = useInState('Alex');
   const size = useWindowSize();
   const updateName = (e: ChangeEvent<HTMLInputElement>) =>
     name.set(e.target.value);
-  const width = useWidth(size);
-  const height = useProp(constState<'height'>('height'), size);
+  const width = useWidth<number>(size);
+  const width_: State<number> = useWidth(size);
+  const width__ = useWidthOfNumber(size);
+  /** For type checking */
+  const widthCube = useSum(width, width_, width__);
+  /** No lambda generation. Single declaration of prop name and type */
+  const height: State<number> = useProp(constState('height'), size);
   const semiPerimeter = useSum(width, height);
   const square = useProd(width, height);
   const str = useString`Hello ${name}! width = ${width}`;
