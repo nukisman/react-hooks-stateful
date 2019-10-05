@@ -12,6 +12,7 @@ export interface State<S> {
 }
 
 // TODO: immutability
+// TODO: Transparency between S and State<S> hook arguments
 
 /*********************************************************
  * Utility hooks
@@ -236,12 +237,6 @@ export const useMethod = <T, A, R>(
 /*********************************************************
  * Array hooks
  * *******************************************************/
-
-// export const reuseReduce = <A, R>(
-//   initial: R,
-//   reduce: (acc: R, arg: A) => R
-// ) => (...args: State<A>[]): State<R> =>
-//   useDepStates(args, (args: A[]) => args.reduce(reduce, initial));
 
 // TODO: reuseReduceObj
 export const reuseReduce = <A, R>(
