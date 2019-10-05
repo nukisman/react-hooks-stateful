@@ -1,9 +1,8 @@
 import React, { ChangeEvent, FC } from 'react';
 
-import { useInState } from 'react-dep-state';
+import { useInState, constState, State } from 'react-dep-state';
 
 import { useWindowSize } from 'react-dep-state/responsive';
-import { constState, State } from 'react-dep-state/main';
 import {
   useProp,
   useString,

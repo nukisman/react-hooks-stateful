@@ -7,9 +7,25 @@ import stringify from 'stringify-object';
 
 export type Predicate<A> = (s: A) => boolean;
 
-export interface State<S> {
-  readonly state: S;
+export class State<S> {
+  private readonly s: S;
+  constructor(state: S) {
+    this.s = state;
+  }
+  get state(): S {
+    return this.s;
+  }
 }
+
+// const a: State<string> = { state: '' };
+// const b = { state: '' };
+// console.log(a instanceof State);
+// console.log(b instanceof State);
+
+type EitherState<S> = S | State<S>;
+
+const getState = <S>(state: EitherState<S>): S =>
+  state instanceof State ? state.state : state;
 
 // TODO: immutability
 // TODO: Transparency between S and State<S> hook arguments
@@ -37,16 +53,22 @@ export const useDebug = (value: any): void => {
 /*********************************************************
  * Read-Only state
  * *******************************************************/
-export const constState: <S>(state: S) => State<S> = state => ({
-  state
-});
+export const constState: <S>(state: S) => State<S> = state => new State(state);
 
 /*********************************************************
  * Input state hooks
  * *******************************************************/
-export interface In<S> extends State<S> {
-  set: (state: S) => void;
-  update: (upd: (prev: S) => S) => void;
+type SetState<S> = (state: S) => void;
+type UpdateState<S> = (upd: (prev: S) => S) => void;
+
+export class In<S> extends State<S> {
+  readonly set: SetState<S>;
+  readonly update: UpdateState<S>;
+  constructor(state: S, set: SetState<S>, update: UpdateState<S>) {
+    super(state);
+    this.set = set;
+    this.update = update;
+  }
 }
 
 export type Lazy<S> = () => S;
@@ -68,7 +90,7 @@ export const useInState = <S>(initialState: Initial<S>): In<S> => {
     const reUpd = (prev: S): S => re.set(state, upd(prev));
     setState(reUpd);
   };
-  return { state, set, update };
+  return new In(state, set, update);
 };
 
 /*********************************************************
@@ -85,7 +107,7 @@ export const useDepState = <D, S>(
   if (reNewState !== state) {
     setState(() => reNewState);
   }
-  return { state };
+  return new State(state);
 };
 export const useDepState2 = <D1, D2, S>(
   d1: State<D1>,
@@ -102,7 +124,7 @@ export const useDepState2 = <D1, D2, S>(
   if (reNewState !== state) {
     setState(() => reNewState);
   }
-  return { state };
+  return new State(state);
 };
 // todo: useDepState3, useDepState4, ...
 
@@ -120,7 +142,7 @@ export const useDepStates = <D, S>(
   if (reNewState !== state) {
     setState(() => reNewState);
   }
-  return { state };
+  return new State(state);
 };
 
 /*********************************************************

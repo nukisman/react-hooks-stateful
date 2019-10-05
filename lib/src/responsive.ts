@@ -18,7 +18,7 @@ export const useWindowSize: () => State<Size> = () => {
     window.addEventListener('resize', listen);
     return () => window.removeEventListener('resize', listen);
   }, []);
-  return { state: size.state };
+  return new State(size.state);
 };
 
 export const useWindowWidth: () => State<number> = () =>
