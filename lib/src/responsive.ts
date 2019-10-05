@@ -3,8 +3,8 @@ import React, { useEffect } from 'react';
 import { constState, State, useDepState2, useInState } from './main';
 import { useLte } from './operator';
 
-type Size = { width: number; height: number };
-const getSize = (): Size => ({
+export type Size = { width: number; height: number };
+export const getSize = (): Size => ({
   width: window.innerWidth,
   height: window.innerHeight
 });

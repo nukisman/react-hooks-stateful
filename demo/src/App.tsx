@@ -2,16 +2,24 @@ import React, { ChangeEvent, FC } from 'react';
 
 import { useInState } from 'react-dep-state';
 
-import { useWindowSize } from 'react-dep-state/responsive';
+import { useWindowSize, Size } from 'react-dep-state/responsive';
 import { constState } from 'react-dep-state/main';
-import { useProp, useString, useSum, useProd } from 'react-dep-state/operator';
+import {
+  useProp,
+  useString,
+  useSum,
+  useProd,
+  reuseProp
+} from 'react-dep-state/operator';
+
+const useWidth = reuseProp<'width', Size>(constState('width'));
 
 const App: FC = () => {
   const name = useInState('Alex');
   const size = useWindowSize();
   const updateName = (e: ChangeEvent<HTMLInputElement>) =>
     name.set(e.target.value);
-  const width = useProp(constState<'width'>('width'), size);
+  const width = useWidth(size);
   const height = useProp(constState<'height'>('height'), size);
   const semiPerimeter = useSum(width, height);
   const square = useProd(width, height);
