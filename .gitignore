@@ -1,8 +1,8 @@
 /.idea/
 
-/example/node_modules/
-/example/node_modules/react-dep-state/
-/example/build/
+/demo/node_modules/
+/demo/node_modules/react-dep-state/
+/demo/build/
 
 /lib/build/
 /lib/main/
