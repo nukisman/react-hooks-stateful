@@ -2,7 +2,6 @@
 import padEnd from 'lodash/padEnd';
 
 export type Int = number;
-export type Maybe<T> = T | undefined;
 export type Lazy<T> = () => T;
 
 export const identity: <T>(x: T) => T = x => x;
@@ -37,9 +36,9 @@ export const array = <T>(n: number, create: (n: number) => T) =>
 export const randomInt = (max: number): number =>
   parseInt((max * Math.random()).toFixed(0), 10);
 
-export const rMaybe: <T>(
-  renderT: (x: T) => JSX.Element | string
-) => (x: Maybe<T>) => JSX.Element | string = renderT => x =>
-  x === undefined ? 'undefined' : renderT(x);
+// export const rMaybe: <T>(
+//   renderT: (x: T) => JSX.Element | string
+// ) => (x: Maybe<T>) => JSX.Element | string = renderT => x =>
+//   x === undefined ? 'undefined' : renderT(x);
 
 export const rBool = (x: boolean) => (x ? 'true' : 'false');

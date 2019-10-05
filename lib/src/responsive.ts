@@ -1,6 +1,7 @@
 /** Created by Alexander Nuikin <nukisman@gmail.com> */
 import React, { useEffect } from 'react';
-import { State, useDepState2, useInState, useLte } from './main';
+import { constState, State, useDepState2, useInState } from './main';
+import { useLte } from './operator';
 
 type Size = { width: number; height: number };
 const getSize = (): Size => ({
@@ -20,26 +21,16 @@ export const useWindowSize: () => State<Size> = () => {
   return { state: size.state };
 };
 
-// todo: useWindowWidth = () => useProp('width', useWindowSize())
-export const useWindowWidth: () => State<number> = () => ({
-  state: useWindowSize().state.width
-});
+export const useWindowWidth: () => State<number> = () =>
+  constState(useWindowSize().state.width);
 
-// todo: useWindowHeight = () => useProp('height', useWindowSize())
-export const useWindowHeight: () => State<number> = () => ({
-  state: useWindowSize().state.height
-});
+export const useWindowHeight: () => State<number> = () =>
+  constState(useWindowSize().state.height);
 
-// ResponsivePropTypes.depMobile = DepPropTypes.depState(
-//   PropTypes.bool.isRequired
-// );
 export const useDepMobile: (
   threshold: State<number>
 ) => State<boolean> = threshold => useLte(useWindowWidth(), threshold);
 
-// ResponsivePropTypes.depWidthLevels = DepPropTypes.depState(
-//   PropTypes.arrayOf(PropTypes.bool.isRequired).isRequired
-// );
 export const useDepWidthLevels: (
   threshold: State<number[]>
 ) => State<boolean[]> = levels => {
