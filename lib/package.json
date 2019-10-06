@@ -5,7 +5,7 @@
   "author": "nukisman",
   "license": "MIT",
   "repository": "nukisman/react-dep-state",
-  "main": "build/index.umd.js",
+  "main": "build/index.js",
   "module": "build/index.esm.js",
   "engines": {
     "node": ">=8",
