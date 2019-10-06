@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC } from 'react';
+import React, { ChangeEvent, FC, ReactNode } from 'react';
 import {
   useInput,
   Stateful,
@@ -8,32 +8,40 @@ import {
   useSum,
   useProd,
   reuseProp,
-  reusePropOf,
-  useWindowWidth
+  reusePropOf
 } from 'react-dep-state';
 
-/** Width of some type defined later */
+/** Reusable Width of some type defined later */
 const useWidth = reuseProp('width');
 
-/** Width of number */
+/** Reusable Width of number */
 const useWidthOfNumber = reusePropOf('width')<number>();
 
 const App: FC = () => {
   const name = useInput('Alex');
   const size = useWindowSize();
-  const ww: Stateful<number> = useWindowWidth();
   const updateName = (e: ChangeEvent<HTMLInputElement>) =>
     name.set(e.target.value);
-  const width = useWidth<number>(size);
-  const width_: Stateful<number> = useWidth(size);
-  const width__ = useWidthOfNumber(size);
+  const { width, height } = size;
+  const width_ = size.state.width;
+  const width__ = useWidth<number>(size);
+  const width___: Stateful<number> = useWidth(size);
+  const width____ = useWidthOfNumber(size);
+  const width_____: Stateful<number> = useProp('width', size);
   /** For type checking */
-  const widthCube = useSum(width, width_, width__);
+  const widthSum = useSum(
+    size.width,
+    width,
+    width_,
+    width__,
+    width___,
+    width____,
+    width_____
+  );
   /** No lambda generation. Single declaration of prop name and type */
-  const height: Stateful<number> = useProp('height', size);
   const semiPerimeter = useSum(width, height);
   const square = useProd(width, height);
-  const str = useString`Hello ${name}! width = ${width}, num: ${width.state}`;
+  const str = useString`Hello ${name}! width = ${width}, num: ${size.width}`;
   return (
     <>
       <h4>Example: react-dep-state</h4>
@@ -43,17 +51,17 @@ const App: FC = () => {
       <div>
         Window:
         <br />
-        size: {size.state.width} x {size.state.height} px
+        size: {width} x {height} px
         <br />
-        ww: {ww.state}
+        width: {width} px
         <br />
-        size.width: {width.state} px
-        <br />
-        size.height: {height.state} px
+        height: {height} px
         <br />
         Semi-perimeter: {semiPerimeter.state} px
         <br />
         Square: {square.state} px^2
+        <br />
+        widthSum: {widthSum.state}
       </div>
       <br />
       <div>Str: {str.state}</div>
