@@ -49,7 +49,7 @@ const App: FC = () => {
   const sizeKeys: string[] = [];
   for (const k in size) sizeKeys.push(k);
   const array = useInputArray([width, width_____, height]);
-  const concatArray = useConcat(array, [width, height]);
+  const concatArray = useConcat(array, width, [width, height], width);
   const mapArray = useMap(concatArray, n => n * 2);
   const joinArray = useJoin(mapArray, '; ');
   return (

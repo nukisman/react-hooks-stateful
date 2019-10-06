@@ -10,34 +10,13 @@ import {
 } from './core';
 
 /** Concat arrays using array spread operator */
-// TODO: varargs
-export const useConcat = function<A>(
-  arr1: OrStateful<A[]>,
-  arr2: OrStateful<A[]>
-): AndStateful<A[]> {
-  return useDep2<A[], A[], A[]>(arr1, arr2, (arr1: A[], arr2: A[]) => [
-    ...arr1,
-    ...arr2
+export const useConcat = <A>(
+  ...args: OrStateful<OrStateful<A[] | A>>[]
+): AndStateful<A[]> =>
+  useReduce<A[] | A, A[]>(args.map(getState), [], (acc, arg) => [
+    ...acc,
+    ...(Array.isArray(arg) ? arg : [arg])
   ]);
-};
-
-/** Push item to array using array spread operator */
-// TODO: varargs items
-export const usePush = function<A>(
-  arr: OrStateful<A[]>,
-  item: OrStateful<A>
-): AndStateful<A[]> {
-  return useDep2<A[], A, A[]>(arr, item, (arr: A[], item: A) => [...arr, item]);
-};
-
-/** Unshift item to array using array spread operator */
-// TODO: varargs items
-export const useUnshift = function<A>(
-  arr: OrStateful<A[]>,
-  item: OrStateful<A>
-): AndStateful<A[]> {
-  return useDep2<A[], A, A[]>(arr, item, (arr: A[], item: A) => [item, ...arr]);
-};
 
 type OrArray<S> = OrStateful<OrStateful<S>[]>;
 // TODO: reuseReduceObj
