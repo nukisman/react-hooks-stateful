@@ -1,12 +1,12 @@
 import {
   useDep2,
   useDeps,
-  reuseReduce,
   reuseDep,
   reuseDep2,
   OrStateful,
   AndStateful
 } from './core';
+import { reuseReduce } from './array';
 
 /*********************************************************
  * JS Operators hooks
@@ -65,35 +65,11 @@ export const useExtend = function<A, B>(
   }));
 };
 
-/** Concat arrays using array spread operator */
-export const useConcat = function<A>(
-  arr1: OrStateful<A[]>,
-  arr2: OrStateful<A[]>
-): AndStateful<A[]> {
-  return useDep2<A[], A[], A[]>(arr1, arr2, (arr1: A[], arr2: A[]) => [
-    ...arr1,
-    ...arr2
-  ]);
-};
-
-/** Push item to array using array spread operator */
-export const usePush = function<A>(
-  arr: OrStateful<A[]>,
-  item: OrStateful<A>
-): AndStateful<A[]> {
-  return useDep2<A[], A, A[]>(arr, item, (arr: A[], item: A) => [...arr, item]);
-};
-
-/** Unshift item to array using array spread operator */
-export const useUnshift = function<A>(
-  arr: OrStateful<A[]>,
-  item: OrStateful<A>
-): AndStateful<A[]> {
-  return useDep2<A[], A, A[]>(arr, item, (arr: A[], item: A) => [item, ...arr]);
-};
-
 /** Concat strings */
-export const useConcatString = reuseReduce('', (acc, s: string) => acc + s);
+export const useConcatString = reuseReduce(
+  '',
+  (acc: string, s: string) => acc + s
+);
 
 /** Tagged template string for State<any> values.
  * Usage: useString`Name: ${nameState}, Age: ${ageState}`

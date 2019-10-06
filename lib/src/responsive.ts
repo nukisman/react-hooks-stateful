@@ -1,13 +1,6 @@
 /** Created by Alexander Nuikin <nukisman@gmail.com> */
 import React, { useEffect } from 'react';
-import {
-  andState,
-  AndStateful,
-  OrStateful,
-  Stateful,
-  useDep2,
-  useInput
-} from './core';
+import { andState, AndStateful, OrStateful, useDep2, useInput } from './core';
 import { useLte } from './operator';
 
 export type Size = { width: number; height: number };
