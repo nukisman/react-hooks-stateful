@@ -1,5 +1,11 @@
 import isFunction from 'lodash/isFunction';
-import { useDebugValue, useMemo, useState } from 'react';
+import {
+  JSXElementConstructor,
+  ReactElement,
+  useDebugValue,
+  useMemo,
+  useState
+} from 'react';
 // @ts-ignore
 import * as re from 'reupdate';
 // @ts-ignore
@@ -14,6 +20,9 @@ export class Stateful<S> {
   }
   get state(): S {
     return this.s;
+  }
+  valueOf() {
+    return String(this.s);
   }
 }
 
@@ -264,7 +273,8 @@ export const useMethod = <T, A, R>(
 export const reuseReduce = <A, R>(
   initial: R,
   reduce: (acc: R, arg: A, index: number) => R
-) => (...args: Stateful<A>[]): Stateful<R> => useReduce(args, initial, reduce);
+) => (...args: OrStateful<A>[]): Stateful<R> =>
+  useReduce(args, initial, reduce);
 
 export const useReduce = <A, R>(
   args: OrStateful<A>[],
