@@ -5,12 +5,8 @@
   "author": "nukisman",
   "license": "MIT",
   "repository": "nukisman/react-dep-state",
-  "main": "main/index.js",
-  "files": [
-    "main",
-    "responsive",
-    "operator"
-  ],
+  "main": "build/index.umd.js",
+  "module": "build/index.esm.js",
   "engines": {
     "node": ">=8",
     "npm": ">=5"
@@ -53,9 +49,6 @@
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-react": "^7.14.3",
     "gh-pages": "^2.1.1",
-    "gulp": "^4.0.2",
-    "gulp-rename": "^1.4.0",
-    "gulp-rm": "^2.0.0",
     "prettier": "^1.18.2",
     "react-scripts": "^3.1.2",
     "rollup": "^1.21.4",

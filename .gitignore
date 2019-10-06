@@ -9,3 +9,4 @@
 /lib/main
 /lib/responsive
 /lib/operator
+/lib/*.d.ts

@@ -5,7 +5,7 @@ import {
   reuseReduce,
   reuse,
   reuse2
-} from './main';
+} from './core';
 
 /*********************************************************
  * JS Operators hooks

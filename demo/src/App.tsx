@@ -1,16 +1,16 @@
 import React, { ChangeEvent, FC } from 'react';
-
-import { useInState, constState, State } from 'react-dep-state';
-
-import { useWindowSize } from 'react-dep-state/responsive';
 import {
+  useInState,
+  constState,
+  State,
+  useWindowSize,
   useProp,
   useString,
   useSum,
   useProd,
   reuseProp,
   reusePropOf
-} from 'react-dep-state/operator';
+} from 'react-dep-state';
 
 /** Width of some type defined later */
 const useWidth = reuseProp(constState('width'));

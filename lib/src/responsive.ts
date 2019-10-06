@@ -1,6 +1,6 @@
 /** Created by Alexander Nuikin <nukisman@gmail.com> */
 import React, { useEffect } from 'react';
-import { constState, State, useDepState2, useInState } from './main';
+import { constState, State, useDepState2, useInState } from './core';
 import { useLte } from './operator';
 
 export type Size = { width: number; height: number };
