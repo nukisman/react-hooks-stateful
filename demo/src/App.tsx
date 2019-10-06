@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, ReactNode } from 'react';
+import React, { ChangeEvent, FC } from 'react';
 import {
   useInput,
   Stateful,
@@ -23,7 +23,7 @@ const App: FC = () => {
   const updateName = (e: ChangeEvent<HTMLInputElement>) =>
     name.set(e.target.value);
   const { width, height } = size;
-  const width_ = size.state.width;
+  const width_ = size.width;
   const width__ = useWidth<number>(size);
   const width___: Stateful<number> = useWidth(size);
   const width____ = useWidthOfNumber(size);
@@ -41,27 +41,36 @@ const App: FC = () => {
   /** No lambda generation. Single declaration of prop name and type */
   const semiPerimeter = useSum(width, height);
   const square = useProd(width, height);
-  const str = useString`Hello ${name}! width = ${width}, num: ${size.width}`;
+  const str = useString`Hello ${name}! width: ${width}, ${size.width}, ${size.state.width}`;
+  const sizeKeys: string[] = [];
+  for (const k in size) sizeKeys.push(k);
   return (
     <>
       <h4>Example: react-dep-state</h4>
       <input defaultValue={name.state} onChange={updateName} />
-      <div>name: {name.state}</div>
+      <div>name.state: {name.state}</div>
       <br />
       <div>
         Window:
         <br />
         size: {width} x {height} px
         <br />
-        width: {width} px
-        <br />
-        height: {height} px
-        <br />
         Semi-perimeter: {semiPerimeter.state} px
         <br />
         Square: {square.state} px^2
         <br />
         widthSum: {widthSum.state}
+        <br />
+        sizeKeys: [{sizeKeys.join(', ')}]
+        <br />
+        size.state keys: [{Object.keys(size.state).join(', ')}]
+        <br />
+        size keys: [{Object.keys(size).join(', ')}]
+        <br />
+        size OwnPropertyNames: [{Object.getOwnPropertyNames(size).join(', ')}]
+        <br />
+        size OwnPropertySymbols: [
+        {Object.getOwnPropertySymbols(size).join(', ')}]
       </div>
       <br />
       <div>Str: {str.state}</div>

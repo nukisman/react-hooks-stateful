@@ -1,11 +1,5 @@
 import isFunction from 'lodash/isFunction';
-import {
-  JSXElementConstructor,
-  ReactElement,
-  useDebugValue,
-  useMemo,
-  useState
-} from 'react';
+import { useDebugValue, useMemo, useState } from 'react';
 // @ts-ignore
 import * as re from 'reupdate';
 // @ts-ignore
@@ -21,20 +15,31 @@ export class Stateful<S> {
   get state(): S {
     return this.s;
   }
-  valueOf() {
-    return String(this.s);
-  }
 }
 
-// const a: State<string> = { state: '' };
-// const b = { state: '' };
-// console.log(a instanceof State);
-// console.log(b instanceof State);
-
 export type OrStateful<S> = S | Stateful<S>;
+export type AndStateful<S> = S & Stateful<S>;
 
 export const getState = <S>(state: OrStateful<S>): S =>
   state instanceof Stateful ? state.state : state;
+
+export const andState = <S>(st: Stateful<S>): AndStateful<S> => {
+  return new Proxy<Stateful<S>>(st, {
+    get(target: Stateful<S>, name: string) {
+      if (name === 'state') return target.state;
+      else return target.state[name];
+    },
+    getOwnPropertyDescriptor(
+      target: Stateful<S>,
+      name: string | number | symbol
+    ): PropertyDescriptor | undefined {
+      return Object.getOwnPropertyDescriptor(target.state, name);
+    },
+    ownKeys(target: Stateful<S>) {
+      return Object.keys(target.state);
+    }
+  }) as AndStateful<S>;
+};
 
 // TODO: immutability
 
@@ -61,8 +66,8 @@ export const useDebug = (value: any): void => {
 /*********************************************************
  * Read-Only state
  * *******************************************************/
-export const constState: <S>(state: S) => Stateful<S> = state =>
-  new Stateful(state);
+export const constState: <S>(state: S) => AndStateful<S> = state =>
+  andState(new Stateful(state));
 
 /*********************************************************
  * Input (independent writeable) state hooks
@@ -107,7 +112,7 @@ export const useInput = <S>(initialState: Initial<S>): Input<S> => {
 export const useDep = <D, S>(
   dep: OrStateful<D>,
   compute: (depState: D) => S
-): Stateful<S> => {
+): AndStateful<S> => {
   const [state, setState] = useState(() => compute(getState(dep)));
   const newState = useMemo(() => compute(getState(dep)), [getState(dep)]);
   /** ReUpdate state to new state */
@@ -115,13 +120,13 @@ export const useDep = <D, S>(
   if (reNewState !== state) {
     setState(() => reNewState);
   }
-  return new Stateful(state);
+  return andState(new Stateful(state));
 };
 export const useDep2 = <D1, D2, S>(
   d1: OrStateful<D1>,
   d2: OrStateful<D2>,
   compute: (d1: D1, d2: D2) => S
-): Stateful<S> => {
+): AndStateful<S> => {
   const [state, setState] = useState(() => compute(getState(d1), getState(d2)));
   const newState = useMemo(() => compute(getState(d1), getState(d2)), [
     getState(d1),
@@ -132,14 +137,14 @@ export const useDep2 = <D1, D2, S>(
   if (reNewState !== state) {
     setState(() => reNewState);
   }
-  return new Stateful(state);
+  return andState(new Stateful(state));
 };
 // todo: useDepState3, useDepState4, ...
 
 export const useDeps = <D, S>(
   deps: OrStateful<D>[],
   compute: (depsStates: D[]) => S
-): Stateful<S> => {
+): AndStateful<S> => {
   const [state, setState] = useState(() => compute(deps.map(getState)));
   const newState = useMemo(
     () => compute(deps.map(getState)),
@@ -150,7 +155,7 @@ export const useDeps = <D, S>(
   if (reNewState !== state) {
     setState(() => reNewState);
   }
-  return new Stateful(state);
+  return andState(new Stateful(state));
 };
 
 /*********************************************************
@@ -158,17 +163,17 @@ export const useDeps = <D, S>(
  * *******************************************************/
 export const reuseDep = <A, R>(compute: (a: A) => R) => (
   a: OrStateful<A>
-): Stateful<R> => useDep(a, compute);
+): AndStateful<R> => useDep(a, compute);
 
 export const reuseDep2 = <A, B, R>(compute: (a: A, b: B) => R) => (
   a: OrStateful<A>,
   b: OrStateful<B>
-): Stateful<R> => useDep2(a, b, compute);
+): AndStateful<R> => useDep2(a, b, compute);
 // todo: reuseDep3, reuseDep4, ...
 
 export const reuseDeps = <D, S>(compute: (depsStates: D[]) => S) => (
   deps: OrStateful<D>[]
-): Stateful<S> => useDeps(deps, compute);
+): AndStateful<S> => useDeps(deps, compute);
 
 /*********************************************************
  * Errors
@@ -252,7 +257,7 @@ export type Maybe<T> = T | undefined;
 export const useFromMaybe = <A>(
   maybe: OrStateful<Maybe<A>>,
   dflt: OrStateful<A>
-): Stateful<A> => useDep2(maybe, dflt, (maybe, dflt) => maybe || dflt);
+): AndStateful<A> => useDep2(maybe, dflt, (maybe, dflt) => maybe || dflt);
 
 /*********************************************************
  * OOP hooks
@@ -262,7 +267,7 @@ export const useMethod = <T, A, R>(
   self: OrStateful<T>,
   method: (arg: A, self: T) => R,
   arg: OrStateful<A>
-): Stateful<R> =>
+): AndStateful<R> =>
   useDep2(self, arg, (self, arg) => method.bind(self)(arg, self));
 
 /*********************************************************
@@ -273,38 +278,38 @@ export const useMethod = <T, A, R>(
 export const reuseReduce = <A, R>(
   initial: R,
   reduce: (acc: R, arg: A, index: number) => R
-) => (...args: OrStateful<A>[]): Stateful<R> =>
+) => (...args: OrStateful<A>[]): AndStateful<R> =>
   useReduce(args, initial, reduce);
 
 export const useReduce = <A, R>(
   args: OrStateful<A>[],
   initial: R,
   reduce: (acc: R, arg: A, index: number) => R
-): Stateful<R> => useDeps(args, (args: A[]) => args.reduce(reduce, initial));
+): AndStateful<R> => useDeps(args, (args: A[]) => args.reduce(reduce, initial));
 
 // TODO: reuseMapObj
 export const reuseMap = <A, B>(map: (arg: A, index: number) => B) => (
   ...args: OrStateful<A>[]
-): Stateful<B[]> => useMap(args, map);
+): AndStateful<B[]> => useMap(args, map);
 
 export const useMap = <A, B>(
   args: OrStateful<A>[],
   map: (arg: A, index: number) => B
-): Stateful<B[]> => useDeps(args, (args: A[]) => args.map(map));
+): AndStateful<B[]> => useDeps(args, (args: A[]) => args.map(map));
 
 // TODO: reuseFilterObj
 export const reuseFilter = <S>(
   filter: (arg: S, index: number, array: S[]) => boolean
-) => (...args: OrStateful<S>[]): Stateful<S[]> => useFilter(args, filter);
+) => (...args: OrStateful<S>[]): AndStateful<S[]> => useFilter(args, filter);
 
 export const useFilter = <S>(
   args: OrStateful<S>[],
   filter: (arg: S, index: number, array: S[]) => boolean
-): Stateful<S[]> => useDeps(args, (args: S[]) => args.filter(filter));
+): AndStateful<S[]> => useDeps(args, (args: S[]) => args.filter(filter));
 
 // todo: Iterable instead of Array?
 export const useFind = <S>(
   array: OrStateful<S[]>,
   predicate: OrStateful<Predicate<S>>
-): Stateful<Maybe<S>> => useMethod(array, getState(array).find, predicate);
+): AndStateful<Maybe<S>> => useMethod(array, getState(array).find, predicate);
 // todo: Other array functions

@@ -1,11 +1,11 @@
 import {
-  Stateful,
   useDep2,
   useDeps,
   reuseReduce,
   reuseDep,
   reuseDep2,
-  OrStateful
+  OrStateful,
+  AndStateful
 } from './core';
 
 /*********************************************************
@@ -16,7 +16,7 @@ export const useEq = (
   a: OrStateful<any>,
   b: OrStateful<any>,
   ...rest: OrStateful<any>[]
-): Stateful<boolean> =>
+): AndStateful<boolean> =>
   reuseReduce(a === b, (acc: boolean, value: any) => acc && a === value)(
     ...rest
   );
@@ -35,14 +35,14 @@ export const reuseProp = <K extends string>(name: OrStateful<K>) => <
   T extends { [P in K]: S } = { [P in K]: S }
 >(
   obj: OrStateful<T>
-): Stateful<S> =>
+): AndStateful<S> =>
   useDep2<K, T, T[K]>(name, obj, (name: K, obj: T) => obj[name]);
 
 export const reusePropOf = <K extends string>(name: OrStateful<K>) => <S>() => <
   T extends { [P in K]: S } = { [P in K]: S }
 >(
   obj: OrStateful<T>
-): Stateful<S> => reuseProp<K>(name)<S, T>(obj);
+): AndStateful<S> => reuseProp<K>(name)<S, T>(obj);
 
 export const useProp = <
   K extends string,
@@ -51,14 +51,14 @@ export const useProp = <
 >(
   name: OrStateful<K>,
   obj: OrStateful<T>
-): Stateful<S> =>
+): AndStateful<S> =>
   useDep2<K, T, T[K]>(name, obj, (name: K, obj: T) => obj[name]);
 
 /** Spread objects */
 export const useExtend = function<A, B>(
   objA: OrStateful<A>,
   objB: OrStateful<B>
-): Stateful<A & B> {
+): AndStateful<A & B> {
   return useDep2<A, B, A & B>(objA, objB, (objA: A, objB: B) => ({
     ...objA,
     ...objB
@@ -69,7 +69,7 @@ export const useExtend = function<A, B>(
 export const useConcat = function<A>(
   arr1: OrStateful<A[]>,
   arr2: OrStateful<A[]>
-): Stateful<A[]> {
+): AndStateful<A[]> {
   return useDep2<A[], A[], A[]>(arr1, arr2, (arr1: A[], arr2: A[]) => [
     ...arr1,
     ...arr2
@@ -80,7 +80,7 @@ export const useConcat = function<A>(
 export const usePush = function<A>(
   arr: OrStateful<A[]>,
   item: OrStateful<A>
-): Stateful<A[]> {
+): AndStateful<A[]> {
   return useDep2<A[], A, A[]>(arr, item, (arr: A[], item: A) => [...arr, item]);
 };
 
@@ -88,7 +88,7 @@ export const usePush = function<A>(
 export const useUnshift = function<A>(
   arr: OrStateful<A[]>,
   item: OrStateful<A>
-): Stateful<A[]> {
+): AndStateful<A[]> {
   return useDep2<A[], A, A[]>(arr, item, (arr: A[], item: A) => [item, ...arr]);
 };
 
@@ -101,7 +101,7 @@ export const useConcatString = reuseReduce('', (acc, s: string) => acc + s);
 export const useString = (
   literals: TemplateStringsArray,
   ...placeholders: OrStateful<any>[]
-): Stateful<string> =>
+): AndStateful<string> =>
   useDeps<any[], string>(placeholders, placeholders => {
     let result = '';
 
