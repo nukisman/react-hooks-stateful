@@ -1,6 +1,6 @@
 /** Created by Alexander Nuikin <nukisman@gmail.com> */
 import React, { useEffect } from 'react';
-import { constState, State, useDepState2, useInState } from './core';
+import { constState, OrStateful, Stateful, useDep2, useInput } from './core';
 import { useLte } from './operator';
 
 export type Size = { width: number; height: number };
@@ -9,8 +9,8 @@ export const getSize = (): Size => ({
   height: window.innerHeight
 });
 
-export const useWindowSize: () => State<Size> = () => {
-  const size = useInState(getSize);
+export const useWindowSize: () => Stateful<Size> = () => {
+  const size = useInput(getSize);
   useEffect(() => {
     const listen = () => {
       size.set(getSize());
@@ -18,24 +18,24 @@ export const useWindowSize: () => State<Size> = () => {
     window.addEventListener('resize', listen);
     return () => window.removeEventListener('resize', listen);
   }, []);
-  return new State(size.state);
+  return new Stateful(size.state);
 };
 
-export const useWindowWidth: () => State<number> = () =>
+export const useWindowWidth: () => Stateful<number> = () =>
   constState(useWindowSize().state.width);
 
-export const useWindowHeight: () => State<number> = () =>
+export const useWindowHeight: () => Stateful<number> = () =>
   constState(useWindowSize().state.height);
 
 export const useDepMobile: (
-  threshold: State<number>
-) => State<boolean> = threshold => useLte(useWindowWidth(), threshold);
+  threshold: OrStateful<number>
+) => Stateful<boolean> = threshold => useLte(useWindowWidth(), threshold);
 
 export const useDepWidthLevels: (
-  threshold: State<number[]>
-) => State<boolean[]> = levels => {
+  threshold: OrStateful<number[]>
+) => Stateful<boolean[]> = levels => {
   const width = useWindowWidth();
-  return useDepState2<number, number[], boolean[]>(
+  return useDep2<number, number[], boolean[]>(
     width,
     levels,
     (width, levels) => {

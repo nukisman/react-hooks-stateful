@@ -7,7 +7,7 @@ import stringify from 'stringify-object';
 
 export type Predicate<A> = (s: A) => boolean;
 
-export class State<S> {
+export class Stateful<S> {
   private readonly s: S;
   constructor(state: S) {
     this.s = state;
@@ -22,13 +22,12 @@ export class State<S> {
 // console.log(a instanceof State);
 // console.log(b instanceof State);
 
-type EitherState<S> = S | State<S>;
+export type OrStateful<S> = S | Stateful<S>;
 
-const getState = <S>(state: EitherState<S>): S =>
-  state instanceof State ? state.state : state;
+export const getState = <S>(state: OrStateful<S>): S =>
+  state instanceof Stateful ? state.state : state;
 
 // TODO: immutability
-// TODO: Transparency between S and State<S> hook arguments
 
 /*********************************************************
  * Utility hooks
@@ -53,15 +52,16 @@ export const useDebug = (value: any): void => {
 /*********************************************************
  * Read-Only state
  * *******************************************************/
-export const constState: <S>(state: S) => State<S> = state => new State(state);
+export const constState: <S>(state: S) => Stateful<S> = state =>
+  new Stateful(state);
 
 /*********************************************************
- * Input state hooks
+ * Input (independent writeable) state hooks
  * *******************************************************/
 type SetState<S> = (state: S) => void;
 type UpdateState<S> = (upd: (prev: S) => S) => void;
 
-export class In<S> extends State<S> {
+export class Input<S> extends Stateful<S> {
   readonly set: SetState<S>;
   readonly update: UpdateState<S>;
   constructor(state: S, set: SetState<S>, update: UpdateState<S>) {
@@ -72,10 +72,9 @@ export class In<S> extends State<S> {
 }
 
 export type Lazy<S> = () => S;
-
 export type Initial<S> = S | Lazy<S>;
 
-export const useInState = <S>(initialState: Initial<S>): In<S> => {
+export const useInput = <S>(initialState: Initial<S>): Input<S> => {
   if (isFunction(initialState)) {
     /** Lazy evaluation of initial state */
     initialState = initialState();
@@ -90,76 +89,77 @@ export const useInState = <S>(initialState: Initial<S>): In<S> => {
     const reUpd = (prev: S): S => re.set(state, upd(prev));
     setState(reUpd);
   };
-  return new In(state, set, update);
+  return new Input(state, set, update);
 };
 
 /*********************************************************
  * Dependent state hooks
  * *******************************************************/
-export const useDepState = <D, S>(
-  dep: State<D>,
+export const useDep = <D, S>(
+  dep: OrStateful<D>,
   compute: (depState: D) => S
-): State<S> => {
-  const [state, setState] = useState(() => compute(dep.state));
-  const newState = useMemo(() => compute(dep.state), [dep.state]);
+): Stateful<S> => {
+  const [state, setState] = useState(() => compute(getState(dep)));
+  const newState = useMemo(() => compute(getState(dep)), [getState(dep)]);
   /** ReUpdate state to new state */
   const reNewState = re.set(state, newState);
   if (reNewState !== state) {
     setState(() => reNewState);
   }
-  return new State(state);
+  return new Stateful(state);
 };
-export const useDepState2 = <D1, D2, S>(
-  d1: State<D1>,
-  d2: State<D2>,
+export const useDep2 = <D1, D2, S>(
+  d1: OrStateful<D1>,
+  d2: OrStateful<D2>,
   compute: (d1: D1, d2: D2) => S
-): State<S> => {
-  const [state, setState] = useState(() => compute(d1.state, d2.state));
-  const newState = useMemo(() => compute(d1.state, d2.state), [
-    d1.state,
-    d2.state
+): Stateful<S> => {
+  const [state, setState] = useState(() => compute(getState(d1), getState(d2)));
+  const newState = useMemo(() => compute(getState(d1), getState(d2)), [
+    getState(d1),
+    getState(d2)
   ]);
   /** ReUpdate state to new state */
   const reNewState = re.set(state, newState);
   if (reNewState !== state) {
     setState(() => reNewState);
   }
-  return new State(state);
+  return new Stateful(state);
 };
 // todo: useDepState3, useDepState4, ...
 
-export const useDepStates = <D, S>(
-  deps: State<D>[],
+export const useDeps = <D, S>(
+  deps: OrStateful<D>[],
   compute: (depsStates: D[]) => S
-): State<S> => {
-  const [state, setState] = useState(() => compute(deps.map(d => d.state)));
+): Stateful<S> => {
+  const [state, setState] = useState(() => compute(deps.map(getState)));
   const newState = useMemo(
-    () => compute(deps.map(d => d.state)),
-    deps.map(d => d.state)
+    () => compute(deps.map(getState)),
+    deps.map(getState)
   );
   /** ReUpdate state to new state */
   const reNewState = re.set(state, newState);
   if (reNewState !== state) {
     setState(() => reNewState);
   }
-  return new State(state);
+  return new Stateful(state);
 };
 
 /*********************************************************
  * Reuse helpers
  * *******************************************************/
-export const reuse = <A, R>(compute: (a: A) => R) => (a: State<A>): State<R> =>
-  useDepState(a, compute);
+export const reuseDep = <A, R>(compute: (a: A) => R) => (
+  a: OrStateful<A>
+): Stateful<R> => useDep(a, compute);
 
-export const reuse2 = <A, B, R>(compute: (a: A, b: B) => R) => (
-  a: State<A>,
-  b: State<B>
-): State<R> => useDepState2(a, b, compute);
-// todo: reuse3, reuse4, ...
+export const reuseDep2 = <A, B, R>(compute: (a: A, b: B) => R) => (
+  a: OrStateful<A>,
+  b: OrStateful<B>
+): Stateful<R> => useDep2(a, b, compute);
+// todo: reuseDep3, reuseDep4, ...
 
-export const reuseAll = <D, S>(compute: (depsStates: D[]) => S) => (
-  deps: State<D>[]
-): State<S> => useDepStates(deps, compute);
+export const reuseDeps = <D, S>(compute: (depsStates: D[]) => S) => (
+  deps: OrStateful<D>[]
+): Stateful<S> => useDeps(deps, compute);
 
 /*********************************************************
  * Errors
@@ -241,20 +241,20 @@ export const reuseAll = <D, S>(compute: (depsStates: D[]) => S) => (
 export type Maybe<T> = T | undefined;
 
 export const useFromMaybe = <A>(
-  maybe: State<Maybe<A>>,
-  dflt: State<A>
-): State<A> => useDepState2(maybe, dflt, (maybe, dflt) => maybe || dflt);
+  maybe: OrStateful<Maybe<A>>,
+  dflt: OrStateful<A>
+): Stateful<A> => useDep2(maybe, dflt, (maybe, dflt) => maybe || dflt);
 
 /*********************************************************
  * OOP hooks
  * *******************************************************/
 
 export const useMethod = <T, A, R>(
-  self: State<T>,
+  self: OrStateful<T>,
   method: (arg: A, self: T) => R,
-  arg: State<A>
-): State<R> =>
-  useDepState2(self, arg, (self, arg) => method.bind(self)(arg, self));
+  arg: OrStateful<A>
+): Stateful<R> =>
+  useDep2(self, arg, (self, arg) => method.bind(self)(arg, self));
 
 /*********************************************************
  * Array hooks
@@ -264,37 +264,37 @@ export const useMethod = <T, A, R>(
 export const reuseReduce = <A, R>(
   initial: R,
   reduce: (acc: R, arg: A, index: number) => R
-) => (...args: State<A>[]): State<R> => useReduce(args, initial, reduce);
+) => (...args: Stateful<A>[]): Stateful<R> => useReduce(args, initial, reduce);
 
 export const useReduce = <A, R>(
-  args: State<A>[],
+  args: OrStateful<A>[],
   initial: R,
   reduce: (acc: R, arg: A, index: number) => R
-): State<R> => useDepStates(args, (args: A[]) => args.reduce(reduce, initial));
+): Stateful<R> => useDeps(args, (args: A[]) => args.reduce(reduce, initial));
 
 // TODO: reuseMapObj
 export const reuseMap = <A, B>(map: (arg: A, index: number) => B) => (
-  ...args: State<A>[]
-): State<B[]> => useMap(args, map);
+  ...args: OrStateful<A>[]
+): Stateful<B[]> => useMap(args, map);
 
 export const useMap = <A, B>(
-  args: State<A>[],
+  args: OrStateful<A>[],
   map: (arg: A, index: number) => B
-): State<B[]> => useDepStates(args, (args: A[]) => args.map(map));
+): Stateful<B[]> => useDeps(args, (args: A[]) => args.map(map));
 
 // TODO: reuseFilterObj
 export const reuseFilter = <S>(
   filter: (arg: S, index: number, array: S[]) => boolean
-) => (...args: State<S>[]): State<S[]> => useFilter(args, filter);
+) => (...args: OrStateful<S>[]): Stateful<S[]> => useFilter(args, filter);
 
 export const useFilter = <S>(
-  args: State<S>[],
+  args: OrStateful<S>[],
   filter: (arg: S, index: number, array: S[]) => boolean
-): State<S[]> => useDepStates(args, (args: S[]) => args.filter(filter));
+): Stateful<S[]> => useDeps(args, (args: S[]) => args.filter(filter));
 
 // todo: Iterable instead of Array?
 export const useFind = <S>(
-  array: State<S[]>,
-  predicate: State<Predicate<S>>
-): State<Maybe<S>> => useMethod(array, array.state.find, predicate);
+  array: OrStateful<S[]>,
+  predicate: OrStateful<Predicate<S>>
+): Stateful<Maybe<S>> => useMethod(array, getState(array).find, predicate);
 // todo: Other array functions
