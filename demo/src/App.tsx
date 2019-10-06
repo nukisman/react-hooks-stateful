@@ -8,7 +8,11 @@ import {
   useSum,
   useProd,
   reuseProp,
-  reusePropOf
+  reusePropOf,
+  useInputArray,
+  useMap,
+  useConcat,
+  useJoin
 } from 'react-dep-state';
 
 /** Reusable Width of some type defined later */
@@ -18,7 +22,7 @@ const useWidth = reuseProp('width');
 const useWidthOfNumber = reusePropOf('width')<number>();
 
 const App: FC = () => {
-  const name = useInput('Alex');
+  const name = useInput('AlexY');
   const size = useWindowSize();
   const updateName = (e: ChangeEvent<HTMLInputElement>) =>
     name.set(e.target.value);
@@ -44,6 +48,10 @@ const App: FC = () => {
   const str = useString`Hello ${name}! width: ${width}, ${size.width}, ${size.state.width}`;
   const sizeKeys: string[] = [];
   for (const k in size) sizeKeys.push(k);
+  const array = useInputArray([width, width_____, height]);
+  const concatArray = useConcat(array, [width, height]);
+  const mapArray = useMap(concatArray, n => n * 2);
+  const joinArray = useJoin(mapArray, '; ');
   return (
     <>
       <h4>Example: react-dep-state</h4>
@@ -74,6 +82,26 @@ const App: FC = () => {
       </div>
       <br />
       <div>Str: {str.state}</div>
+      <hr />
+      <div>Array: {array.state.join(', ')}</div>
+      <button onClick={() => array.map(n => n + 1)}>Map: n =&gt; n + 1</button>
+      <br />
+      Filter: n &gt;&nbsp;
+      <input
+        type="number"
+        defaultValue={200}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          array.filter(n => n > e.target.valueAsNumber);
+        }}
+      />
+      <hr />
+      Dependent arrays:
+      <br />
+      Concat: [{concatArray.join(', ')}]
+      <br />
+      Map: [{mapArray.join(', ')}]
+      <br />
+      Join: ({joinArray.state})
     </>
   );
 };

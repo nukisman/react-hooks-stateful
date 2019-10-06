@@ -15,7 +15,6 @@ export const getSize = (): Size => ({
   width: window.innerWidth,
   height: window.innerHeight
 });
-console.log('getSize:', Object.getOwnPropertyNames(getSize()));
 
 export const useWindowSize: () => AndStateful<Size> = () => {
   const size = useInput(getSize);
@@ -26,7 +25,7 @@ export const useWindowSize: () => AndStateful<Size> = () => {
     window.addEventListener('resize', listen);
     return () => window.removeEventListener('resize', listen);
   }, []);
-  return andState(new Stateful(size.state));
+  return andState(size);
 };
 
 export const useDepMobile: (

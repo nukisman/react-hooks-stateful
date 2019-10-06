@@ -1,19 +1,34 @@
-import isFunction from 'lodash/isFunction';
 import { useDebugValue, useMemo, useState } from 'react';
 // @ts-ignore
 import * as re from 'reupdate';
 // @ts-ignore
 import stringify from 'stringify-object';
 
+export type Lazy<S> = () => S;
+export type Initial<S> = S | Lazy<S>;
 export type Predicate<A> = (s: A) => boolean;
 
 export class Stateful<S> {
-  private readonly s: S;
-  constructor(state: S) {
-    this.s = state;
+  protected s: [S, (newState: S | ((newState: S) => S)) => void];
+  constructor(initialState: Initial<S>) {
+    this.s = useState<S>(initialState);
   }
   get state(): S {
-    return this.s;
+    const [state] = this.s;
+    return state;
+  }
+  protected updateState(upd: (newState: S) => S) {
+    const [state, setState] = this.s;
+    const reallyNewState: S = re.set(state, upd(state));
+    // const change = {
+    //   reallyNewState,
+    //   state
+    // };
+    if (reallyNewState !== state) {
+      // console.log('Changed:', change);
+      setState(reallyNewState);
+      // this._state = reallyNewState;
+    } //else console.log('Not changed:', change);
   }
 }
 
@@ -26,7 +41,7 @@ export const getState = <S>(state: OrStateful<S>): S =>
 export const andState = <S>(st: Stateful<S>): AndStateful<S> => {
   return new Proxy<Stateful<S>>(st, {
     get(target: Stateful<S>, name: string) {
-      if (name === 'state') return target.state;
+      if (target[name]) return target[name];
       else return target.state[name];
     },
     getOwnPropertyDescriptor(
@@ -72,38 +87,17 @@ export const constState: <S>(state: S) => AndStateful<S> = state =>
 /*********************************************************
  * Input (independent writeable) state hooks
  * *******************************************************/
-type SetState<S> = (state: S) => void;
-type UpdateState<S> = (upd: (prev: S) => S) => void;
-
 export class Input<S> extends Stateful<S> {
-  readonly set: SetState<S>;
-  readonly update: UpdateState<S>;
-  constructor(state: S, set: SetState<S>, update: UpdateState<S>) {
-    super(state);
-    this.set = set;
-    this.update = update;
+  set(state: S) {
+    this.updateState(() => state);
+  }
+  update(upd: (prev: S) => S) {
+    this.updateState(upd);
   }
 }
 
-export type Lazy<S> = () => S;
-export type Initial<S> = S | Lazy<S>;
-
 export const useInput = <S>(initialState: Initial<S>): Input<S> => {
-  if (isFunction(initialState)) {
-    /** Lazy evaluation of initial state */
-    initialState = initialState();
-  }
-  const [state, setState] = useState<S>(initialState);
-  const set = (newState: S): void => {
-    /** ReUpdate state to new state */
-    setState(() => re.set(state, newState));
-  };
-  const update = (upd: (prev: S) => S): void => {
-    /** Make ReUpdater */
-    const reUpd = (prev: S): S => re.set(state, upd(prev));
-    setState(reUpd);
-  };
-  return new Input(state, set, update);
+  return new Input<S>(initialState);
 };
 
 /*********************************************************
@@ -113,49 +107,42 @@ export const useDep = <D, S>(
   dep: OrStateful<D>,
   compute: (depState: D) => S
 ): AndStateful<S> => {
-  const [state, setState] = useState(() => compute(getState(dep)));
-  const newState = useMemo(() => compute(getState(dep)), [getState(dep)]);
-  /** ReUpdate state to new state */
-  const reNewState = re.set(state, newState);
-  if (reNewState !== state) {
-    setState(() => reNewState);
-  }
-  return andState(new Stateful(state));
+  const factory = () => compute(getState(dep));
+  const input = new Input(factory);
+  input.set(useMemo(factory, [getState(dep)]));
+  return andState(input);
 };
 export const useDep2 = <D1, D2, S>(
   d1: OrStateful<D1>,
   d2: OrStateful<D2>,
   compute: (d1: D1, d2: D2) => S
 ): AndStateful<S> => {
-  const [state, setState] = useState(() => compute(getState(d1), getState(d2)));
-  const newState = useMemo(() => compute(getState(d1), getState(d2)), [
-    getState(d1),
-    getState(d2)
-  ]);
-  /** ReUpdate state to new state */
-  const reNewState = re.set(state, newState);
-  if (reNewState !== state) {
-    setState(() => reNewState);
-  }
-  return andState(new Stateful(state));
+  const factory = () => compute(getState(d1), getState(d2));
+  const input = useInput(factory);
+  input.set(useMemo(factory, [getState(d1), getState(d2)]));
+  return andState(input);
 };
-// todo: useDepState3, useDepState4, ...
+export const useDep3 = <D1, D2, D3, S>(
+  d1: OrStateful<D1>,
+  d2: OrStateful<D2>,
+  d3: OrStateful<D3>,
+  compute: (d1: D1, d2: D2, d3: D3) => S
+): AndStateful<S> => {
+  const factory = () => compute(getState(d1), getState(d2), getState(d3));
+  const input = useInput(factory);
+  input.set(useMemo(factory, [getState(d1), getState(d2), getState(d3)]));
+  return andState(input);
+};
+// todo: useDep4, useDep5, ...
 
 export const useDeps = <D, S>(
   deps: OrStateful<D>[],
   compute: (depsStates: D[]) => S
 ): AndStateful<S> => {
-  const [state, setState] = useState(() => compute(deps.map(getState)));
-  const newState = useMemo(
-    () => compute(deps.map(getState)),
-    deps.map(getState)
-  );
-  /** ReUpdate state to new state */
-  const reNewState = re.set(state, newState);
-  if (reNewState !== state) {
-    setState(() => reNewState);
-  }
-  return andState(new Stateful(state));
+  const factory = () => compute(deps.map(getState));
+  const input = useInput(factory);
+  input.set(useMemo(factory, deps.map(getState)));
+  return andState(input);
 };
 
 /*********************************************************
@@ -169,10 +156,16 @@ export const reuseDep2 = <A, B, R>(compute: (a: A, b: B) => R) => (
   a: OrStateful<A>,
   b: OrStateful<B>
 ): AndStateful<R> => useDep2(a, b, compute);
-// todo: reuseDep3, reuseDep4, ...
+
+export const reuseDep3 = <A, B, C, R>(compute: (a: A, b: B, c: C) => R) => (
+  a: OrStateful<A>,
+  b: OrStateful<B>,
+  c: OrStateful<C>
+): AndStateful<R> => useDep3(a, b, c, compute);
+// todo: reuseDep4, reuseDep5, ...
 
 export const reuseDeps = <D, S>(compute: (depsStates: D[]) => S) => (
-  deps: OrStateful<D>[]
+  ...deps: OrStateful<D>[]
 ): AndStateful<S> => useDeps(deps, compute);
 
 /*********************************************************
@@ -273,43 +266,75 @@ export const useMethod = <T, A, R>(
 /*********************************************************
  * Array hooks
  * *******************************************************/
-
+type OrArray<S> = OrStateful<OrStateful<S>[]>;
 // TODO: reuseReduceObj
 export const reuseReduce = <A, R>(
-  initial: R,
-  reduce: (acc: R, arg: A, index: number) => R
+  initial: OrStateful<R>,
+  reduce: OrStateful<(acc: R, arg: A, index: number) => R>
 ) => (...args: OrStateful<A>[]): AndStateful<R> =>
   useReduce(args, initial, reduce);
 
 export const useReduce = <A, R>(
-  args: OrStateful<A>[],
-  initial: R,
-  reduce: (acc: R, arg: A, index: number) => R
-): AndStateful<R> => useDeps(args, (args: A[]) => args.reduce(reduce, initial));
+  array: OrArray<A>,
+  initial: OrStateful<R>,
+  reduce: OrStateful<(acc: R, arg: A, index: number) => R>
+): AndStateful<R> =>
+  useDep3(array, initial, reduce, (array, initial, reduce) =>
+    array.map(getState).reduce(reduce, initial)
+  );
 
 // TODO: reuseMapObj
-export const reuseMap = <A, B>(map: (arg: A, index: number) => B) => (
-  ...args: OrStateful<A>[]
-): AndStateful<B[]> => useMap(args, map);
+export const reuseMap = <A, B>(
+  map: OrStateful<(arg: A, index: number) => B>
+) => (array: OrArray<A>): AndStateful<B[]> => useMap(array, map);
 
 export const useMap = <A, B>(
-  args: OrStateful<A>[],
-  map: (arg: A, index: number) => B
-): AndStateful<B[]> => useDeps(args, (args: A[]) => args.map(map));
+  array: OrArray<A>,
+  map: OrStateful<(arg: A, index: number) => B>
+): AndStateful<B[]> =>
+  useDep2(array, map, (array, map) => array.map(getState).map(map));
 
 // TODO: reuseFilterObj
 export const reuseFilter = <S>(
-  filter: (arg: S, index: number, array: S[]) => boolean
-) => (...args: OrStateful<S>[]): AndStateful<S[]> => useFilter(args, filter);
+  filter: OrStateful<(arg: S, index: number, array: S[]) => boolean>
+) => (array: OrArray<S>): AndStateful<S[]> => useFilter(array, filter);
 
 export const useFilter = <S>(
-  args: OrStateful<S>[],
-  filter: (arg: S, index: number, array: S[]) => boolean
-): AndStateful<S[]> => useDeps(args, (args: S[]) => args.filter(filter));
+  array: OrArray<S>,
+  filter: OrStateful<(arg: S, index: number, array: S[]) => boolean>
+): AndStateful<S[]> =>
+  useDep2(array, filter, (array, filter) => array.map(getState).filter(filter));
 
+// type AndStatefulMaybe<S> =
 // todo: Iterable instead of Array?
 export const useFind = <S>(
-  array: OrStateful<S[]>,
+  array: OrArray<S>,
   predicate: OrStateful<Predicate<S>>
-): AndStateful<Maybe<S>> => useMethod(array, getState(array).find, predicate);
+): AndStateful<Maybe<S>> =>
+  useDep2(array, predicate, (args, predicate) =>
+    args.map(getState).find(predicate)
+  );
+// useMethod(array, getState(array).find, predicate);
+export const useJoin = <S>(
+  array: OrArray<S>,
+  separator: OrStateful<string>
+): AndStateful<string> =>
+  useDep2(array, separator, (args, separator) =>
+    args.map(getState).join(separator)
+  );
+
 // todo: Other array functions
+
+export class InputArray<S> extends Input<S[]> {
+  map(map: (item: S, index: number) => S) {
+    this.updateState(array => array.map(map));
+  }
+  filter(filter: (item: S, index: number) => boolean) {
+    this.updateState(array => array.filter(filter));
+  }
+}
+
+export const useInputArray = <S>(array: OrStateful<S>[]): InputArray<S> => {
+  const states: S[] = array.map(getState);
+  return new InputArray<S>(states);
+};
