@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FC } from 'react';
 import {
   useInput,
-  Stateful,
+  Pure,
   useWindowSize,
   useProp,
   useString,
@@ -27,7 +27,7 @@ import {
   useAsyncDep2,
   useMouse,
   MouseEventType
-} from 'react-hooks-stateful';
+} from 'react-hooks-pure';
 
 /** Reusable Width of some type defined later */
 const useWidth = reuseProp('width');
@@ -60,11 +60,11 @@ const App: FC = () => {
   const { width, height } = size;
   const width_ = size.width;
   const width__ = useWidth<number>(size);
-  const width___: Stateful<number> = useWidth(size);
+  const width___: Pure<number> = useWidth(size);
   const width____ = useWidthOfNumber(size);
-  const width_____: Stateful<number> = useProp('width', size);
+  const width_____: Pure<number> = useProp('width', size);
 
-  const readOnly: Stateful<number> = width__;
+  const readOnly: Pure<number> = width__;
   const writeReadOnly = () => {
     let writeReadOnly = false;
     try {
@@ -123,7 +123,7 @@ const App: FC = () => {
   );
   return (
     <>
-      <h4>Example: react-hooks-stateful</h4>
+      <h4>Example: react-hooks-pure</h4>
       ReadOnly: {readOnly.state}
       <br />
       <button onClick={writeReadOnly}>Write ReadOnly Stateful !</button>
@@ -225,7 +225,7 @@ const App: FC = () => {
 
 const AsyncView: FC<{
   name: string;
-  async: Stateful<AsyncState<any>>;
+  async: Pure<AsyncState<any>>;
   onClick?: () => void;
 }> = ({ name, async, onClick }) => {
   return (

@@ -1,6 +1,6 @@
 {
-  "name": "react-hooks-stateful-demo",
-  "homepage": "https://nukisman.github.io/react-hooks-stateful",
+  "name": "react-hooks-pure-demo",
+  "homepage": "https://nukisman.github.io/react-hooks-pure",
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "react-hooks-stateful": "^1.0.0"
+    "react-hooks-pure": "^1.0.2"
   },
   "peerDependencies": {},
   "devDependencies": {

@@ -52,7 +52,6 @@ export const useFilter = <S>(
 ): AndState<S[]> =>
   useDep2(array, filter, (array, filter) => array.map(getState).filter(filter));
 
-// type AndStatefulMaybe<S> =
 // todo: Iterable instead of Array?
 export const useFind = <S>(
   array: OrArray<S>,
@@ -73,7 +72,7 @@ export const useJoin = <S>(
 // todo: Other array functions
 
 /**
- * Input Array - Stateful with mutable array state
+ * Input Array.
  * Hook: useInputArray.
  */
 export class InputArray<S> extends Input<S[]> {

@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  SyntaxError: /Users/uruk/job/js/react-hooks-stateful/example/package.json: Unexpected token } in JSON at position 217
+  SyntaxError: /Users/uruk/job/js/react-hooks-pure/example/package.json: Unexpected token } in JSON at position 217
       at JSON.parse (<anonymous>)
       at /usr/local/Cellar/yarn/1.17.3/libexec/lib/cli.js:1625:59
       at Generator.next (<anonymous>)
@@ -23,13 +23,13 @@ Trace:
 
 npm manifest: 
   {
-    "name": "react-hooks-stateful-example",
-    "homepage": "https://nukisman.github.io/react-hooks-stateful",
+    "name": "react-hooks-pure-example",
+    "homepage": "https://nukisman.github.io/react-hooks-pure",
     "version": "0.0.0",
     "license": "MIT",
     "private": true,
     "dependencies": {
-      "react-hooks-stateful": "link:../",
+      "react-hooks-pure": "link:../",
     },
     "devDependencies": {
       "@types/jest": "^24.0.18",
@@ -8079,7 +8079,7 @@ Lockfile:
       regenerator-runtime "0.13.3"
       whatwg-fetch "3.0.0"
   
-  "react-hooks-stateful@link:..":
+  "react-hooks-pure@link:..":
     version "0.0.0"
     uid ""
   
