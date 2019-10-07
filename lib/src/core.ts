@@ -39,19 +39,29 @@ export class Writable<S> extends Stateful<S> {
   }
   protected setState(newState: S) {
     // TODO: Test, type and fix re.set() for class instances
-    const reallyNewState: S = re.set(this.state, newState);
-    // const change = {
+    const prev = this.state;
+    const reallyNewState: S = re.set(prev, newState);
+    // console.log(reallyNewState !== prev ? 'Changed:' : 'Not changed:', {
     //   reallyNewState,
-    //   state
-    // };
-    if (reallyNewState !== this.state) {
-      // console.log('Changed:', change);
+    //   prev
+    // });
+    if (reallyNewState !== prev) {
       this._setState(reallyNewState);
       // this._state = reallyNewState;
-    } //else console.log('Not changed:', change);
+    }
   }
-  protected updateState(upd: (newState: S) => S) {
-    this.setState(upd(this.state));
+  protected updateState(upd: (state: S) => S) {
+    // console.log(this._setState);
+    this._setState(prev => {
+      const newState = upd(prev);
+      const reallyNewState = re.set(prev, newState);
+      // console.log(reallyNewState !== prev ? 'Changed:' : 'Not changed:', {
+      //   reallyNewState,
+      //   prev
+      // });
+      return reallyNewState === prev ? prev : reallyNewState;
+    });
+    // this.setState(upd(this.state));
   }
 }
 
@@ -60,7 +70,7 @@ export class Writable<S> extends Stateful<S> {
  * *******************************************************/
 export class Input<S> extends Writable<S> {
   set(state: S) {
-    this.updateState(() => state);
+    this.setState(state);
   }
   update(upd: (prev: S) => S) {
     this.updateState(upd);
