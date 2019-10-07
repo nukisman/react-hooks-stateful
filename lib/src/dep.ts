@@ -1,5 +1,12 @@
 import { useMemo } from 'react';
-import { andState, AndState, getState, Input, OrState, useInput } from './core';
+import {
+  AndState,
+  andStateRO,
+  getState,
+  Input,
+  OrState,
+  useInput
+} from './core';
 
 /*********************************************************
  * Dependent state hooks
@@ -11,7 +18,7 @@ export const useDep = <D, S>(
   const factory = () => compute(getState(dep));
   const input = new Input(factory);
   input.set(useMemo(factory, [getState(dep)]));
-  return andState(input);
+  return andStateRO(input);
 };
 export const useDep2 = <D1, D2, S>(
   d1: OrState<D1>,
@@ -21,7 +28,7 @@ export const useDep2 = <D1, D2, S>(
   const factory = () => compute(getState(d1), getState(d2));
   const input = useInput(factory);
   input.set(useMemo(factory, [getState(d1), getState(d2)]));
-  return andState(input);
+  return andStateRO(input);
 };
 export const useDep3 = <D1, D2, D3, S>(
   d1: OrState<D1>,
@@ -32,7 +39,7 @@ export const useDep3 = <D1, D2, D3, S>(
   const factory = () => compute(getState(d1), getState(d2), getState(d3));
   const input = useInput(factory);
   input.set(useMemo(factory, [getState(d1), getState(d2), getState(d3)]));
-  return andState(input);
+  return andStateRO(input);
 };
 // todo: useDep4, useDep5, ...
 
@@ -43,7 +50,7 @@ export const useDeps = <D, S>(
   const factory = () => compute(deps.map(getState));
   const input = useInput(factory);
   input.set(useMemo(factory, deps.map(getState)));
-  return andState(input);
+  return andStateRO(input);
 };
 
 /*********************************************************

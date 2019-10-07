@@ -1,7 +1,7 @@
 /** Created by Alexander Nuikin <nukisman@gmail.com> */
 import { useEffect } from 'react';
 import { useDep2 } from './dep';
-import { andState, AndState, OrState, useInput } from './core';
+import { AndState, andStateRO, OrState, useInput } from './core';
 import { useLte } from './number';
 
 // TODO: useMouse
@@ -21,7 +21,7 @@ export const useWindowSize: () => AndState<Size> = () => {
     window.addEventListener('resize', listen);
     return () => window.removeEventListener('resize', listen);
   }, []);
-  return andState(size);
+  return andStateRO(size);
 };
 
 export const useDepMobile: (

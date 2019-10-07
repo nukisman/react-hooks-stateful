@@ -14,7 +14,8 @@ import {
   useConcat,
   useJoin,
   useSub,
-  useDiv
+  useDiv,
+  Input
 } from 'react-dep-state';
 
 /** Reusable Width of some type defined later */
@@ -34,6 +35,19 @@ const App: FC = () => {
   const width___: Stateful<number> = useWidth(size);
   const width____ = useWidthOfNumber(size);
   const width_____: Stateful<number> = useProp('width', size);
+
+  const readOnly: Stateful<number> = width__;
+  const writeReadOnly = () => {
+    let writeReadOnly = false;
+    try {
+      (readOnly as Input<number>).set(0);
+      writeReadOnly = true;
+    } catch (e) {
+      console.log(e);
+      writeReadOnly = false;
+    }
+    if (writeReadOnly) throw new Error('Write ReadOnly value');
+  };
   /** For type checking */
   const widthSum = useSum(
     size.width,
@@ -62,6 +76,10 @@ const App: FC = () => {
   return (
     <>
       <h4>Example: react-dep-state</h4>
+      ReadOnly: {readOnly.state}
+      <br />
+      <button onClick={writeReadOnly}>Write ReadOnly Stateful !</button>
+      <hr />
       <input defaultValue={name.state} onChange={updateName} />
       <div>name.state: {name.state}</div>
       <br />
