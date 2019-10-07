@@ -16,7 +16,7 @@ import {
   useSub,
   useDiv,
   Input,
-  useAsync,
+  useAsyncInput,
   useAsyncFun0,
   useAsyncFun1,
   useAsyncFun2,
@@ -96,7 +96,7 @@ const App: FC = () => {
   const sub = useSub(width_____, height, width_____, width, 33);
   const prod = useProd(width_____, height, width_____, width, 33);
   const div = useDiv(width_____, height, width_____, width, 33);
-  const async = useAsync<number>();
+  const asyncInput = useAsyncInput<number>();
   const asyncFun0 = useAsyncFun0(asyncInc0, { runOnInit: true });
   const asyncFun1 = useAsyncFun1(asyncInc1, { runOnInit: [0] });
   const asyncFun2 = useAsyncFun2(asyncInc2, { runOnInit: [0, 0] });
@@ -177,9 +177,9 @@ const App: FC = () => {
       Join: ({joinArray.state})
       <hr />
       <AsyncView
-        name="Async"
-        async={async}
-        onClick={() => async.await(asyncRandom())}
+        name="AsyncInput"
+        async={asyncInput}
+        onClick={() => asyncInput.await(asyncRandom())}
       />
       <AsyncView
         name="AsyncFun0"

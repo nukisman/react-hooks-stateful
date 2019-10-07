@@ -27,19 +27,16 @@ const initialState = <S>(): AsyncState<S> => ({
 });
 
 /*********************************************************
- * Async Stateful
+ * Asynchronously Writable Stateful
  * *******************************************************/
-// todo: Update request queueing (takeDirty (no queueing), takeEvery, takeLatest, ...)
-// TODO: AsyncWritable with protected await()
-// TODO: AsyncInput with public await()
+// todo?: Update request queueing (takeDirty (no queueing), takeEvery, takeLatest, ...)
 type Options<S> = { runOnInit?: Promise<S> };
 export class Async<S> extends Writable<AsyncState<S>> {
   constructor(options: Options<S> = {}) {
     super(initialState());
     if (this.state.isInit && options.runOnInit) this.await(options.runOnInit);
   }
-  // TODO: Hide from AsyncFun*
-  await(promise: Promise<S>) {
+  protected await(promise: Promise<S>) {
     this.updateState(s => ({
       ...s,
       status: Status.Await,
@@ -66,7 +63,7 @@ export class Async<S> extends Writable<AsyncState<S>> {
       }
     );
   }
-  reset() {
+  public reset() {
     this.updateState(s => ({
       ...s,
       status: Status.Reset,
@@ -75,7 +72,16 @@ export class Async<S> extends Writable<AsyncState<S>> {
     }));
   }
 }
-export const useAsync = <S>() => new Async<S>();
+
+/*********************************************************
+ * AsyncInput
+ * *******************************************************/
+export class AsyncInput<S> extends Async<S> {
+  public await(promise: Promise<S>) {
+    super.await(promise);
+  }
+}
+export const useAsyncInput = <S>() => new AsyncInput<S>();
 
 /*********************************************************
  * AsyncFun with 0 arguments
