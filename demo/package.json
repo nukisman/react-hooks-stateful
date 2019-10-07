@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "react-hooks-stateful": "^1.0.0"
+    "react-hooks-stateful": "^1.0.2"
   },
   "peerDependencies": {},
   "devDependencies": {

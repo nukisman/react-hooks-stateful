@@ -10,7 +10,8 @@ export type Lazy<S> = () => S;
 export type Initial<S> = S | Lazy<S>;
 export type Predicate<A> = (s: A) => boolean;
 
-export class Stateful<S> {
+/** Pure, read only state holder */
+export class Pure<S> {
   // TODO: immutability of state.**
   readonly state: S;
   constructor(initialState: Initial<S>) {
@@ -20,16 +21,19 @@ export class Stateful<S> {
 }
 
 /*********************************************************
- * Read-Only state
+ * Constant state.
+ * Usually you should not use it, because of
+ * widely usage parameters of type OrState.
  * *******************************************************/
 export const constant: <S>(state: S) => AndState<S> = state =>
-  andState(new Stateful(state));
+  andState(new Pure(state));
 
 /*********************************************************
- * Protected writable stateful
- * E.g. usage: useAsync
+ * Protected writable stateful.
+ * Not for direct usage. For internal inheriting.
+ * E.g. see Input<S> and Async<S>
  * *******************************************************/
-export class Writable<S> extends Stateful<S> {
+export class Writable<S> extends Pure<S> {
   private readonly _setState: (newState: S | ((newState: S) => S)) => void;
   constructor(initialState: Initial<S>) {
     const [state, setState] = useState<S>(initialState);
@@ -65,7 +69,7 @@ export class Writable<S> extends Stateful<S> {
 }
 
 /*********************************************************
- * Input (independent writeable) state hooks
+ * Input - writeable independent state
  * *******************************************************/
 export class Input<S> extends Writable<S> {
   set(state: S) {
@@ -82,34 +86,33 @@ export const useInput = <S>(initialState: Initial<S>): Input<S> => {
 /*********************************************************
  * Helpers
  * *******************************************************/
-export const readOnly = <S>(st: Stateful<S>): Stateful<S> =>
-  new Stateful(st.state);
+export const readOnly = <S>(st: Pure<S>): Pure<S> => new Pure(st.state);
 
 // TODO: Conditional types for better typing (object vs primitives)?
-export type OrState<S> = S | Stateful<S>;
-export type AndState<S> = S & Stateful<S>;
+export type OrState<S> = S | Pure<S>;
+export type AndState<S> = S & Pure<S>;
 
 export const getState = <S>(state: OrState<S>): S =>
-  state instanceof Stateful ? state.state : state;
+  state instanceof Pure ? state.state : state;
 
-// todo: Support T extends Stateful<S>
-export const andState = <S>(st: Stateful<S>): AndState<S> => {
-  return new Proxy<Stateful<S>>(st, {
-    get(target: Stateful<S>, name: string) {
+// todo: Support T extends Pure<S>
+export const andState = <S>(st: Pure<S>): AndState<S> => {
+  return new Proxy<Pure<S>>(st, {
+    get(target: Pure<S>, name: string) {
       if (target[name]) return target[name];
       else return target.state && target.state[name];
     },
     getOwnPropertyDescriptor(
-      target: Stateful<S>,
+      target: Pure<S>,
       name: string | number | symbol
     ): PropertyDescriptor | undefined {
       return Object.getOwnPropertyDescriptor(target.state, name);
     },
-    ownKeys(target: Stateful<S>) {
+    ownKeys(target: Pure<S>) {
       return Object.keys(target.state);
     }
   }) as AndState<S>;
 };
 
-export const andStateRO = <S>(st: Stateful<S>): AndState<S> =>
+export const andStateRO = <S>(st: Pure<S>): AndState<S> =>
   andState(readOnly(st));

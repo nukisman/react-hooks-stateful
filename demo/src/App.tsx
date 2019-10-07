@@ -1,7 +1,7 @@
 import React, { ChangeEvent, FC } from 'react';
 import {
   useInput,
-  Stateful,
+  Pure,
   useWindowSize,
   useProp,
   useString,
@@ -60,11 +60,11 @@ const App: FC = () => {
   const { width, height } = size;
   const width_ = size.width;
   const width__ = useWidth<number>(size);
-  const width___: Stateful<number> = useWidth(size);
+  const width___: Pure<number> = useWidth(size);
   const width____ = useWidthOfNumber(size);
-  const width_____: Stateful<number> = useProp('width', size);
+  const width_____: Pure<number> = useProp('width', size);
 
-  const readOnly: Stateful<number> = width__;
+  const readOnly: Pure<number> = width__;
   const writeReadOnly = () => {
     let writeReadOnly = false;
     try {
@@ -225,7 +225,7 @@ const App: FC = () => {
 
 const AsyncView: FC<{
   name: string;
-  async: Stateful<AsyncState<any>>;
+  async: Pure<AsyncState<any>>;
   onClick?: () => void;
 }> = ({ name, async, onClick }) => {
   return (

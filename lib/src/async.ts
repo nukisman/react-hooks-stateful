@@ -28,7 +28,7 @@ const initialState = <S>(): AsyncState<S> => ({
 });
 
 /*********************************************************
- * Asynchronously Writable Stateful
+ * Asynchronously writable state holder
  * *******************************************************/
 // todo?: Update request queueing (takeDirty (no queueing), takeEvery, takeLatest, ...)
 // TODO: Cancel running await
@@ -116,9 +116,9 @@ export const useAsyncFun0 = <S>(
  * *******************************************************/
 type Options1<A> = { runOnInit?: [A] };
 export class AsyncFun1<A, S> extends Async<S> {
-  private readonly fun: (prev: AsyncState<S>) => (a: OrState<A>) => Promise<S>;
+  private readonly fun: (prev: AsyncState<S>) => (a: A) => Promise<S>;
   constructor(
-    fun: (prev: AsyncState<S>) => (arg: OrState<A>) => Promise<S>,
+    fun: (prev: AsyncState<S>) => (arg: A) => Promise<S>,
     options: Options1<A> = {}
   ) {
     super();
@@ -126,11 +126,11 @@ export class AsyncFun1<A, S> extends Async<S> {
     if (this.state.isInit && options.runOnInit) this.call(...options.runOnInit);
   }
   call(arg: OrState<A>) {
-    this.await(this.fun(this.state)(arg));
+    this.await(this.fun(this.state)(getState(arg)));
   }
 }
 export const useAsyncFun1 = <A, S>(
-  fun: (prev: AsyncState<S>) => (arg: OrState<A>) => Promise<S>,
+  fun: (prev: AsyncState<S>) => (arg: A) => Promise<S>,
   options: Options1<A> = {}
 ) => new AsyncFun1(fun, options);
 
@@ -139,11 +139,9 @@ export const useAsyncFun1 = <A, S>(
  * *******************************************************/
 type Options2<A, B> = { runOnInit?: [A, B] };
 export class AsyncFun2<A, B, S> extends Async<S> {
-  private readonly fun: (
-    prev: AsyncState<S>
-  ) => (a: OrState<A>, b: OrState<B>) => Promise<S>;
+  private readonly fun: (prev: AsyncState<S>) => (a: A, b: B) => Promise<S>;
   constructor(
-    fun: (prev: AsyncState<S>) => (a: OrState<A>, b: OrState<B>) => Promise<S>,
+    fun: (prev: AsyncState<S>) => (a: A, b: B) => Promise<S>,
     options: Options2<A, B> = {}
   ) {
     super();
@@ -151,11 +149,11 @@ export class AsyncFun2<A, B, S> extends Async<S> {
     if (this.state.isInit && options.runOnInit) this.call(...options.runOnInit);
   }
   call(a: OrState<A>, b: OrState<B>) {
-    this.await(this.fun(this.state)(a, b));
+    this.await(this.fun(this.state)(getState(a), getState(b)));
   }
 }
 export const useAsyncFun2 = <A, B, S>(
-  fun: (prev: AsyncState<S>) => (a: OrState<A>, b: OrState<B>) => Promise<S>,
+  fun: (prev: AsyncState<S>) => (a: A, b: B) => Promise<S>,
   options: Options2<A, B> = {}
 ) => new AsyncFun2(fun, options);
 
@@ -166,11 +164,9 @@ type Options3<A, B, C> = { runOnInit?: [A, B, C] };
 export class AsyncFun3<A, B, C, S> extends Async<S> {
   private readonly fun: (
     prev: AsyncState<S>
-  ) => (a: OrState<A>, b: OrState<B>, c: OrState<C>) => Promise<S>;
+  ) => (a: A, b: B, c: C) => Promise<S>;
   constructor(
-    fun: (
-      prev: AsyncState<S>
-    ) => (a: OrState<A>, b: OrState<B>, c: OrState<C>) => Promise<S>,
+    fun: (prev: AsyncState<S>) => (a: A, b: B, c: C) => Promise<S>,
     options: Options3<A, B, C> = {}
   ) {
     super();
@@ -178,13 +174,11 @@ export class AsyncFun3<A, B, C, S> extends Async<S> {
     if (this.state.isInit && options.runOnInit) this.call(...options.runOnInit);
   }
   call(a: OrState<A>, b: OrState<B>, c: OrState<C>) {
-    this.await(this.fun(this.state)(a, b, c));
+    this.await(this.fun(this.state)(getState(a), getState(b), getState(c)));
   }
 }
 export const useAsyncFun3 = <A, B, C, S>(
-  fun: (
-    prev: AsyncState<S>
-  ) => (a: OrState<A>, b: OrState<B>, c: OrState<C>) => Promise<S>,
+  fun: (prev: AsyncState<S>) => (a: A, b: B, c: C) => Promise<S>,
   options: Options3<A, B, C> = {}
 ) => new AsyncFun3(fun, options);
 
