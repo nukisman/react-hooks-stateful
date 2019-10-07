@@ -1,7 +1,10 @@
 /** Created by Alexander Nuikin <nukisman@gmail.com> */
-import React, { useEffect } from 'react';
-import { andState, AndStateful, OrStateful, useDep2, useInput } from './core';
-import { useLte } from './operator';
+import { useEffect } from 'react';
+import { useDep2 } from './dep';
+import { andState, AndState, OrState, useInput } from './core';
+import { useLte } from './number';
+
+// TODO: useMouse
 
 export type Size = { width: number; height: number };
 export const getSize = (): Size => ({
@@ -9,7 +12,7 @@ export const getSize = (): Size => ({
   height: window.innerHeight
 });
 
-export const useWindowSize: () => AndStateful<Size> = () => {
+export const useWindowSize: () => AndState<Size> = () => {
   const size = useInput(getSize);
   useEffect(() => {
     const listen = () => {
@@ -22,13 +25,12 @@ export const useWindowSize: () => AndStateful<Size> = () => {
 };
 
 export const useDepMobile: (
-  threshold: OrStateful<number>
-) => AndStateful<boolean> = threshold =>
-  useLte(useWindowSize().width, threshold);
+  threshold: OrState<number>
+) => AndState<boolean> = threshold => useLte(useWindowSize().width, threshold);
 
 export const useDepWidthLevels: (
-  threshold: OrStateful<number[]>
-) => AndStateful<boolean[]> = levels => {
+  threshold: OrState<number[]>
+) => AndState<boolean[]> = levels => {
   const width = useWindowSize().width;
   return useDep2<number, number[], boolean[]>(
     width,

@@ -22,7 +22,7 @@ const useWidth = reuseProp('width');
 const useWidthOfNumber = reusePropOf('width')<number>();
 
 const App: FC = () => {
-  const name = useInput('AlexY');
+  const name = useInput('AlexZ');
   const size = useWindowSize();
   const updateName = (e: ChangeEvent<HTMLInputElement>) =>
     name.set(e.target.value);

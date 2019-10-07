@@ -1,15 +1,18 @@
-import { useDebugValue, useMemo, useState } from 'react';
+import { useState } from 'react';
 // @ts-ignore
 import * as re from 'reupdate';
-// @ts-ignore
-import stringify from 'stringify-object';
+
+// TODO: TypeScript bug issue: plain object as class instance
+
+// TODO: async.ts: useAsync(n), useLastSuccess, useLastError
 
 export type Lazy<S> = () => S;
 export type Initial<S> = S | Lazy<S>;
 export type Predicate<A> = (s: A) => boolean;
 
+// TODO: Test and fix: mutate immutable Stateful
 export class Stateful<S> {
-  protected s: [S, (newState: S | ((newState: S) => S)) => void];
+  protected readonly s: [S, (newState: S | ((newState: S) => S)) => void];
   constructor(initialState: Initial<S>) {
     this.s = useState<S>(initialState);
   }
@@ -19,6 +22,7 @@ export class Stateful<S> {
   }
   protected updateState(upd: (newState: S) => S) {
     const [state, setState] = this.s;
+    // TODO: Test, (temporary disable) and fix re.set() for class instances
     const reallyNewState: S = re.set(state, upd(state));
     // const change = {
     //   reallyNewState,
@@ -32,13 +36,13 @@ export class Stateful<S> {
   }
 }
 
-export type OrStateful<S> = S | Stateful<S>;
-export type AndStateful<S> = S & Stateful<S>;
+export type OrState<S> = S | Stateful<S>;
+export type AndState<S> = S & Stateful<S>;
 
-export const getState = <S>(state: OrStateful<S>): S =>
+export const getState = <S>(state: OrState<S>): S =>
   state instanceof Stateful ? state.state : state;
 
-export const andState = <S>(st: Stateful<S>): AndStateful<S> => {
+export const andState = <S>(st: Stateful<S>): AndState<S> => {
   return new Proxy<Stateful<S>>(st, {
     get(target: Stateful<S>, name: string) {
       if (target[name]) return target[name];
@@ -53,35 +57,15 @@ export const andState = <S>(st: Stateful<S>): AndStateful<S> => {
     ownKeys(target: Stateful<S>) {
       return Object.keys(target.state);
     }
-  }) as AndStateful<S>;
+  }) as AndState<S>;
 };
 
 // TODO: immutability
 
 /*********************************************************
- * Utility hooks
- * *******************************************************/
-
-export const useDebug = (value: any): void => {
-  useDebugValue(
-    stringify(value, {
-      indent: ' ',
-      inlineCharacterLimit: 500,
-      transform: (obj: any, prop: string, str: string) => {
-        if (str.startsWith('function ')) {
-          return 'f';
-        } else return str;
-      }
-    })
-  );
-};
-
-// todo?: useDebugEffect
-
-/*********************************************************
  * Read-Only state
  * *******************************************************/
-export const constState: <S>(state: S) => AndStateful<S> = state =>
+export const constant: <S>(state: S) => AndState<S> = state =>
   andState(new Stateful(state));
 
 /*********************************************************
@@ -99,74 +83,6 @@ export class Input<S> extends Stateful<S> {
 export const useInput = <S>(initialState: Initial<S>): Input<S> => {
   return new Input<S>(initialState);
 };
-
-/*********************************************************
- * Dependent state hooks
- * *******************************************************/
-export const useDep = <D, S>(
-  dep: OrStateful<D>,
-  compute: (depState: D) => S
-): AndStateful<S> => {
-  const factory = () => compute(getState(dep));
-  const input = new Input(factory);
-  input.set(useMemo(factory, [getState(dep)]));
-  return andState(input);
-};
-export const useDep2 = <D1, D2, S>(
-  d1: OrStateful<D1>,
-  d2: OrStateful<D2>,
-  compute: (d1: D1, d2: D2) => S
-): AndStateful<S> => {
-  const factory = () => compute(getState(d1), getState(d2));
-  const input = useInput(factory);
-  input.set(useMemo(factory, [getState(d1), getState(d2)]));
-  return andState(input);
-};
-export const useDep3 = <D1, D2, D3, S>(
-  d1: OrStateful<D1>,
-  d2: OrStateful<D2>,
-  d3: OrStateful<D3>,
-  compute: (d1: D1, d2: D2, d3: D3) => S
-): AndStateful<S> => {
-  const factory = () => compute(getState(d1), getState(d2), getState(d3));
-  const input = useInput(factory);
-  input.set(useMemo(factory, [getState(d1), getState(d2), getState(d3)]));
-  return andState(input);
-};
-// todo: useDep4, useDep5, ...
-
-export const useDeps = <D, S>(
-  deps: OrStateful<D>[],
-  compute: (depsStates: D[]) => S
-): AndStateful<S> => {
-  const factory = () => compute(deps.map(getState));
-  const input = useInput(factory);
-  input.set(useMemo(factory, deps.map(getState)));
-  return andState(input);
-};
-
-/*********************************************************
- * Reuse helpers
- * *******************************************************/
-export const reuseDep = <A, R>(compute: (a: A) => R) => (
-  a: OrStateful<A>
-): AndStateful<R> => useDep(a, compute);
-
-export const reuseDep2 = <A, B, R>(compute: (a: A, b: B) => R) => (
-  a: OrStateful<A>,
-  b: OrStateful<B>
-): AndStateful<R> => useDep2(a, b, compute);
-
-export const reuseDep3 = <A, B, C, R>(compute: (a: A, b: B, c: C) => R) => (
-  a: OrStateful<A>,
-  b: OrStateful<B>,
-  c: OrStateful<C>
-): AndStateful<R> => useDep3(a, b, c, compute);
-// todo: reuseDep4, reuseDep5, ...
-
-export const reuseDeps = <D, S>(compute: (depsStates: D[]) => S) => (
-  ...deps: OrStateful<D>[]
-): AndStateful<S> => useDeps(deps, compute);
 
 /*********************************************************
  * Errors
@@ -240,25 +156,3 @@ export const reuseDeps = <D, S>(compute: (depsStates: D[]) => S) => (
 //     predicate: dep.state.predicate
 //   };
 // };
-
-/*********************************************************
- * Maybe hooks
- * *******************************************************/
-
-export type Maybe<T> = T | undefined;
-
-export const useFromMaybe = <A>(
-  maybe: OrStateful<Maybe<A>>,
-  dflt: OrStateful<A>
-): AndStateful<A> => useDep2(maybe, dflt, (maybe, dflt) => maybe || dflt);
-
-/*********************************************************
- * OOP hooks
- * *******************************************************/
-
-export const useMethod = <T, A, R>(
-  self: OrStateful<T>,
-  method: (arg: A, self: T) => R,
-  arg: OrStateful<A>
-): AndStateful<R> =>
-  useDep2(self, arg, (self, arg) => method.bind(self)(arg, self));
