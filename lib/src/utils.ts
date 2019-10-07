@@ -1,6 +1,4 @@
 /* Created by Alexander Nuikin (nukisman@gmail.com). */
-import padEnd from 'lodash/padEnd';
-
 export type Int = number;
 export type Lazy<T> = () => T;
 
