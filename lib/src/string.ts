@@ -3,7 +3,7 @@ import { AndState, OrState } from './core';
 import { useDeps } from './dep';
 
 /** Concat strings */
-export const useConcatString = reuseReduce(
+export const useStringConcat = reuseReduce(
   '',
   (acc: string, s: string) => acc + s
 );
