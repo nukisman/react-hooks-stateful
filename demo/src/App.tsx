@@ -12,7 +12,9 @@ import {
   useInputArray,
   useMap,
   useConcat,
-  useJoin
+  useJoin,
+  useSub,
+  useDiv
 } from 'react-dep-state';
 
 /** Reusable Width of some type defined later */
@@ -52,6 +54,11 @@ const App: FC = () => {
   const concatArray = useConcat(array, width, [width, height], width);
   const mapArray = useMap(concatArray, n => n * 2);
   const joinArray = useJoin(mapArray, '; ');
+
+  const sum = useSum(width_____, height, width_____, width, 33);
+  const sub = useSub(width_____, height, width_____, width, 33);
+  const prod = useProd(width_____, height, width_____, width, 33);
+  const div = useDiv(width_____, height, width_____, width, 33);
   return (
     <>
       <h4>Example: react-dep-state</h4>
@@ -80,8 +87,16 @@ const App: FC = () => {
         size OwnPropertySymbols: [
         {Object.getOwnPropertySymbols(size).join(', ')}]
       </div>
+      <hr />
+      <div>Str template: {str.state}</div>
+      <hr />
+      Sum: {sum.state}
       <br />
-      <div>Str: {str.state}</div>
+      Sub: {sub.state}
+      <br />
+      Prod: {prod.state}
+      <br />
+      Div: {div.state}
       <hr />
       <div>Array: {array.state.join(', ')}</div>
       <button onClick={() => array.map(n => n + 1)}>Map: n =&gt; n + 1</button>

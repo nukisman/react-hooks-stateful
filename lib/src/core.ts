@@ -36,6 +36,7 @@ export class Stateful<S> {
   }
 }
 
+// TODO: Conditional types for better typing?
 export type OrState<S> = S | Stateful<S>;
 export type AndState<S> = S & Stateful<S>;
 
