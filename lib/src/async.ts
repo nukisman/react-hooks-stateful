@@ -1,17 +1,19 @@
-import { Writable, OrState } from './core';
+import { Writable, OrState, AndState } from './core';
+import { useDep2 } from './dep';
+import { Maybe } from './maybe';
 
 export enum Status {
-  Reset,
-  Await,
-  Success,
-  Failure
+  Reset = 'Reset',
+  Await = 'Await',
+  Success = 'Success',
+  Failure = 'Failure'
 }
 export type AsyncState<S> = {
-  status: Status;
-  reset: number;
-  isInit: boolean;
-  success: S | undefined;
-  failure: Error | undefined;
+  readonly status: Status;
+  readonly reset: number;
+  readonly isInit: boolean;
+  readonly success: Maybe<S>;
+  readonly failure: Maybe<Error>;
 };
 
 // todo?: defaultSuccess
@@ -33,32 +35,39 @@ export class Async<S> extends Writable<AsyncState<S>> {
     if (this.state.isInit && options.runOnInit) this.await(options.runOnInit);
   }
   await(promise: Promise<S>) {
-    this.setState({ ...this.state, status: Status.Await, isInit: false });
-    promise
-      .then((success: S) => {
-        this.setState({
-          ...this.state,
+    this.updateState(s => ({
+      ...s,
+      status: Status.Await,
+      isInit: false
+    }));
+    promise.then(
+      (success: S) => {
+        // console.log({ success });
+        this.updateState(s => ({
+          ...s,
           status: Status.Success,
           success,
           isInit: false
-        });
-      })
-      .catch((e: Error) =>
-        this.setState({
-          ...this.state,
+        }));
+      },
+      (failure: Error) => {
+        // console.log({ failure });
+        this.updateState(s => ({
+          ...s,
           status: Status.Failure,
-          failure: e,
+          failure,
           isInit: false
-        })
-      );
+        }));
+      }
+    );
   }
   reset() {
-    this.setState({
-      ...this.state,
+    this.updateState(s => ({
+      ...s,
       status: Status.Reset,
-      reset: this.state.reset + 1,
+      reset: s.reset + 1,
       isInit: false
-    });
+    }));
   }
 }
 export const useAsync = <S>() => new Async<S>();
@@ -133,6 +142,34 @@ export const useAsyncFun2 = <A, B, S>(
   fun: (prev: AsyncState<S>) => (a: OrState<A>, b: OrState<B>) => Promise<S>,
   options: Options2<A, B> = {}
 ) => new AsyncFun2(fun, options);
+
+/*********************************************************
+ * Last successful state of async state
+ * *******************************************************/
+export const useSuccess = <S>(
+  dep: OrState<AsyncState<S>>,
+  defaultSuccess?: OrState<Maybe<S>>,
+  mapSuccess?: (s: Maybe<S>) => Maybe<S>
+): AndState<Maybe<S>> => {
+  return useDep2(dep, defaultSuccess, (dep, defaultSuccess) => {
+    const lastSuccess = dep.success || defaultSuccess;
+    return mapSuccess ? mapSuccess(lastSuccess) : lastSuccess;
+  });
+};
+
+/*********************************************************
+ * Last failure state of async state
+ * *******************************************************/
+export const useFailure = (
+  dep: OrState<AsyncState<any>>,
+  defaultFailure: OrState<Maybe<Error>>,
+  mapFailure?: (s: Maybe<Error>) => Maybe<Error>
+): AndState<Maybe<Error>> => {
+  return useDep2(dep, defaultFailure, (dep, defaultFailure) => {
+    const last = dep.failure || defaultFailure;
+    return mapFailure ? mapFailure(last) : last;
+  });
+};
 
 // export interface DepPromise<Success, Failure extends Error>
 //   extends State<Async<Success, Failure>> {}

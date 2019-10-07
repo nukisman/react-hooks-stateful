@@ -19,7 +19,10 @@ import {
   useAsync,
   useAsyncFun0,
   useAsyncFun1,
-  useAsyncFun2
+  useAsyncFun2,
+  Async,
+  useSuccess,
+  useFailure
 } from 'react-dep-state';
 
 /** Reusable Width of some type defined later */
@@ -27,10 +30,22 @@ const useWidth = reuseProp('width');
 
 /** Reusable Width of number */
 const useWidthOfNumber = reusePropOf('width')<number>();
-const asyncRandom = async () => 'Random: ' + Math.random();
-const asyncInc = prev => async () => (prev.success || 0) + 1;
+const asyncRandom = async () => Math.random();
+const asyncInc0 = prev => async () => (prev.success || 0) + 1;
 const asyncInc1 = prev => async a => (prev.success || 0) + a;
 const asyncInc2 = prev => async (a, b) => (prev.success || 0) + a + b;
+const isEven = n => Math.ceil(n / 2) * 2 === n;
+const asyncUnstable = prev => async n => {
+  await delay(500);
+  if (isEven(n)) {
+    return 'OK';
+  } else {
+    throw new Error('Not OK');
+  }
+};
+
+export const delay = (ms: number) =>
+  new Promise(resolve => setTimeout(resolve, ms));
 
 const App: FC = () => {
   const name = useInput('AlexZ');
@@ -81,10 +96,16 @@ const App: FC = () => {
   const sub = useSub(width_____, height, width_____, width, 33);
   const prod = useProd(width_____, height, width_____, width, 33);
   const div = useDiv(width_____, height, width_____, width, 33);
-  const async = useAsync<string>();
-  const asyncFun0 = useAsyncFun0(asyncInc, { runOnInit: true });
+  const async = useAsync<number>();
+  const asyncFun0 = useAsyncFun0(asyncInc0, { runOnInit: true });
   const asyncFun1 = useAsyncFun1(asyncInc1, { runOnInit: [0] });
   const asyncFun2 = useAsyncFun2(asyncInc2, { runOnInit: [0, 0] });
+  const asyncFunUnstable = useAsyncFun1(asyncUnstable);
+  const lastSuccess = useSuccess(asyncFunUnstable, 'Default Success');
+  const lastFailure = useFailure(
+    asyncFunUnstable,
+    new Error('Default Failure')
+  );
   return (
     <>
       <h4>Example: react-dep-state</h4>
@@ -148,23 +169,52 @@ const App: FC = () => {
       <br />
       Join: ({joinArray.state})
       <hr />
-      <button onClick={() => async.await(asyncRandom())}>
-        Await
-      </button> Async: {async.state.success}
+      <AsyncView
+        name="Async"
+        async={async}
+        onClick={() => async.await(asyncRandom())}
+      />
+      <AsyncView
+        name="AsyncFun0"
+        async={asyncFun0}
+        onClick={() => asyncFun0.call()}
+      />
+      <AsyncView
+        name="AsyncFun1"
+        async={asyncFun1}
+        onClick={() => asyncFun1.call(width_____.state)}
+      />
+      <AsyncView
+        name="AsyncFun2"
+        async={asyncFun2}
+        onClick={() => asyncFun2.call(size.height, width_____.state)}
+      />
+      <AsyncView
+        name="Unstable"
+        async={asyncFunUnstable}
+        onClick={() => asyncFunUnstable.call(width)}
+      />
+      Last success: {lastSuccess.state}
       <br />
-      <button onClick={() => asyncFun0.call()}>Call 0</button> AsyncFun:{' '}
-      {asyncFun0.state.success}
-      <br />
-      <button onClick={() => asyncFun1.call(width_____.state)}>
-        Call 1
-      </button>{' '}
-      AsyncFun: {asyncFun1.state.success}
-      <br />
-      <button onClick={() => asyncFun2.call(size.height, width_____.state)}>
-        Call 2
-      </button>{' '}
-      AsyncFun: {asyncFun2.state.success}
+      Last failure: {lastFailure.state.message}
     </>
+  );
+};
+
+const AsyncView: FC<{
+  name: string;
+  async: Async<any>;
+  onClick: () => void;
+}> = ({ name, async, onClick }) => {
+  return (
+    <div>
+      <button onClick={onClick}>Call {name}</button> <br />
+      Status: {async.state.status}
+      <br />
+      Success: {async.state.success}
+      <br />
+      Failure: {async.state.failure && async.state.failure.message}
+    </div>
   );
 };
 
