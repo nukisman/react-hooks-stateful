@@ -76,11 +76,11 @@ export const useJoin = <S>(
  * Hook: useInputArray.
  */
 export class InputArray<S> extends Input<S[]> {
-  map(map: (item: S, index: number) => S) {
-    this.updateState(array => array.map(map));
+  map(map: OrState<(item: S, index: number) => S>) {
+    this.updateState(array => array.map(getState(map)));
   }
-  filter(filter: (item: S, index: number) => boolean) {
-    this.updateState(array => array.filter(filter));
+  filter(filter: OrState<(item: S, index: number) => boolean>) {
+    this.updateState(array => array.filter(getState(filter)));
   }
 }
 
