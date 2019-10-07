@@ -16,7 +16,7 @@ npm install --save react-hooks-stateful
 
 ## Usage
 
-See examples in [react-hooks-stateful/demo](https://github.com/nukisman/react-hooks-stateful/demo)
+See examples in [Demo App](https://github.com/nukisman/react-hooks-stateful/blob/master/demo/src/App.tsx)
 
 ## License
 

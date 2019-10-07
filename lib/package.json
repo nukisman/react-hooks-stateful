@@ -2,7 +2,7 @@
   "name": "react-hooks-stateful",
   "version": "1.0.0",
   "description": "",
-  "author": "nukisman",
+  "author": "nukisman (Alexander Nuikin)",
   "license": "MIT",
   "repository": "nukisman/react-hooks-stateful",
   "main": "build/index.js",
