@@ -1,6 +1,6 @@
 {
   "name": "react-hooks-stateful",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "React Hooks for flexible state management with TypeScript safety",
   "keywords": [
     "react",
