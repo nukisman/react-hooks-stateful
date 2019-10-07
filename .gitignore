@@ -1,7 +1,7 @@
 /.idea
 
 /demo/node_modules
-/demo/node_modules/react-hooks-stateful
+/demo/node_modules/react-hooks-pure
 /demo/build
 
 /lib/build

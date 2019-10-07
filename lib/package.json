@@ -1,21 +1,20 @@
 {
-  "name": "react-hooks-stateful",
+  "name": "react-hooks-pure",
   "version": "1.0.2",
   "description": "React Hooks for pure, dependent, async state management with TypeScript safety",
   "keywords": [
     "react",
     "hooks",
     "state",
-    "stateful",
     "pure",
     "dependent",
     "async"
   ],
-  "homepage": "https://github.com/nukisman/react-hooks-stateful",
+  "homepage": "https://github.com/nukisman/react-hooks-pure",
   "readme": "../RE",
   "author": "nukisman (Alexander Nuikin)",
   "license": "MIT",
-  "repository": "nukisman/react-hooks-stateful",
+  "repository": "nukisman/react-hooks-pure",
   "main": "build/index.js",
   "module": "build/index.esm.js",
   "engines": {

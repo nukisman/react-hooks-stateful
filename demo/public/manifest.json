@@ -1,6 +1,6 @@
 {
-  "short_name": "react-hooks-stateful",
-  "name": "react-hooks-stateful",
+  "short_name": "react-hooks-pure",
+  "name": "react-hooks-pure",
   "start_url": "./index.html",
   "display": "standalone",
   "theme_color": "#000000",
