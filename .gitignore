@@ -10,3 +10,4 @@
 /lib/responsive
 /lib/operator
 /lib/*.d.ts
+/lib/yarn-error.log
