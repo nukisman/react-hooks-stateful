@@ -106,6 +106,13 @@ const App: FC = () => {
     asyncFunUnstable,
     new Error('Default Failure')
   );
+  // TODO: useAsyncDep(N) with async compute
+  const asyncDep = useAsyncFun1<string, string>(
+    prev => async (msg: string) => msg + '!',
+    {
+      runOnInit: [lastSuccess.state]
+    }
+  );
   return (
     <>
       <h4>Example: react-dep-state</h4>
@@ -197,6 +204,11 @@ const App: FC = () => {
       Last success: {lastSuccess.state}
       <br />
       Last failure: {lastFailure.state.message}
+      <AsyncView
+        name="asyncDep"
+        async={asyncDep}
+        onClick={() => asyncDep.call('x')}
+      />
     </>
   );
 };

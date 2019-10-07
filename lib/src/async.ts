@@ -25,15 +25,20 @@ const initialState = <S>(): AsyncState<S> => ({
   success: undefined,
   failure: undefined
 });
+
 /*********************************************************
  * Async Stateful
  * *******************************************************/
+// todo: Update request queueing (takeDirty (no queueing), takeEvery, takeLatest, ...)
+// TODO: AsyncWritable with protected await()
+// TODO: AsyncInput with public await()
 type Options<S> = { runOnInit?: Promise<S> };
 export class Async<S> extends Writable<AsyncState<S>> {
   constructor(options: Options<S> = {}) {
     super(initialState());
     if (this.state.isInit && options.runOnInit) this.await(options.runOnInit);
   }
+  // TODO: Hide from AsyncFun*
   await(promise: Promise<S>) {
     this.updateState(s => ({
       ...s,
@@ -171,96 +176,6 @@ export const useFailure = (
   });
 };
 
-// export interface DepPromise<Success, Failure extends Error>
-//   extends State<Async<Success, Failure>> {}
-//
-// export interface InPromise<Arg, Success, Failure extends Error>
-//   extends DepPromise<Success, Failure> {
-//   set: (arg: Arg) => void;
-//   reset: () => void;
-// }
-
 /*********************************************************
- * Dependent promise hooks
+ * TODO: useAsyncDep(N) with async compute
  * *******************************************************/
-
-// const initialState: <Success, Failure extends Error>() => Async<
-//   Success,
-//   Failure
-// > = () => ({
-//   status: Status.Reset,
-//   reset: 0,
-//   isInit: true,
-//   success: undefined,
-//   failure: undefined
-// });
-
-// todo: Update request queueing (takeDirty (no queueing), takeEvery, takeLatest, ...)
-// PromisePropTypes.inPromise = (
-//   success = PropTypes.any,
-//   failure = PropTypes.instanceOf(Error)
-// ) =>
-//   PromisePropTypes.promise(success, failure, {
-//     set: PropTypes.func.isRequired,
-//     reset: PropTypes.func.isRequired
-//   });
-// export const useInPromise = <Arg, Success, Failure extends Error>(
-//   name: string,
-//   runPromise: (arg: Arg) => Promise<Success | undefined>,
-//   options?: { runOnInit?: { arg: Arg } }
-// ): InPromise<Arg, Success, Failure> => {
-//   options = options || {};
-//   const prom = useInState<Async<Success, Failure>>(
-//     initialState<Success, Failure>()
-//   );
-//   const set = (arg: Arg): void => {
-//     prom.set({ ...prom.state, status: Status.Wip, isInit: false });
-//     console.log(name, 'promise run');
-//     runPromise(arg)
-//       .then((success: Success | undefined) => {
-//         prom.set({
-//           ...prom.state,
-//           status: Status.Success,
-//           success,
-//           isInit: false
-//         });
-//       })
-//       .catch((e: Failure) =>
-//         prom.set({
-//           ...prom.state,
-//           status: Status.Failure,
-//           failure: e,
-//           isInit: false
-//         })
-//       );
-//   };
-//
-//   const reset = () =>
-//     prom.set({
-//       ...prom.state,
-//       status: Status.Reset,
-//       reset: prom.state.reset + 1,
-//       isInit: false
-//     });
-//   if (prom.state.isInit && options.runOnInit) set(options.runOnInit.arg);
-//   // console.log(name, 'promise state:', prom.state);
-//   return { state: prom.state, set, reset };
-// };
-//
-// // todo: useInPromise2, useInPromise3, ...
-//
-// // PromisePropTypes.lastSuccess = DepPropTypes.state;
-// /** Last success of (In)dep promise */
-// export const useLastSuccess = <Success, Failure extends Error>(
-//   dep: State<Async<Success, Failure>>,
-//   defaultSuccess: Success,
-//   mapSuccess?: (s: Success) => Success
-// ): State<Success> => {
-//   return useDepState<Async<Success, Failure>, Success>(dep, depState => {
-//     // console.log('lastSuccess', { dep });
-//     const lastSuccess = depState.success || defaultSuccess;
-//     return mapSuccess ? mapSuccess(lastSuccess) : lastSuccess;
-//   });
-// };
-
-// todo: export const data = useDepPromise(deps, runOnDeps)
