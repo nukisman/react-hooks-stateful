@@ -1,6 +1,7 @@
-import { Writable, OrState, AndState } from './core';
+import { Writable, OrState, AndState, getState, andStateRO } from './core';
 import { useDep2 } from './dep';
 import { Maybe } from './maybe';
+import { useEffect } from 'react';
 
 export enum Status {
   Reset = 'Reset',
@@ -30,6 +31,7 @@ const initialState = <S>(): AsyncState<S> => ({
  * Asynchronously Writable Stateful
  * *******************************************************/
 // todo?: Update request queueing (takeDirty (no queueing), takeEvery, takeLatest, ...)
+// TODO: Cancel running await
 type Options<S> = { runOnInit?: Promise<S> };
 export class Async<S> extends Writable<AsyncState<S>> {
   constructor(options: Options<S> = {}) {
@@ -63,7 +65,7 @@ export class Async<S> extends Writable<AsyncState<S>> {
       }
     );
   }
-  public reset() {
+  protected reset() {
     this.updateState(s => ({
       ...s,
       status: Status.Reset,
@@ -79,6 +81,9 @@ export class Async<S> extends Writable<AsyncState<S>> {
 export class AsyncInput<S> extends Async<S> {
   public await(promise: Promise<S>) {
     super.await(promise);
+  }
+  public reset() {
+    super.reset();
   }
 }
 export const useAsyncInput = <S>() => new AsyncInput<S>();
@@ -155,6 +160,35 @@ export const useAsyncFun2 = <A, B, S>(
 ) => new AsyncFun2(fun, options);
 
 /*********************************************************
+ * AsyncFun with 3 arguments
+ * *******************************************************/
+type Options3<A, B, C> = { runOnInit?: [A, B, C] };
+export class AsyncFun3<A, B, C, S> extends Async<S> {
+  private readonly fun: (
+    prev: AsyncState<S>
+  ) => (a: OrState<A>, b: OrState<B>, c: OrState<C>) => Promise<S>;
+  constructor(
+    fun: (
+      prev: AsyncState<S>
+    ) => (a: OrState<A>, b: OrState<B>, c: OrState<C>) => Promise<S>,
+    options: Options3<A, B, C> = {}
+  ) {
+    super();
+    this.fun = fun;
+    if (this.state.isInit && options.runOnInit) this.call(...options.runOnInit);
+  }
+  call(a: OrState<A>, b: OrState<B>, c: OrState<C>) {
+    this.await(this.fun(this.state)(a, b, c));
+  }
+}
+export const useAsyncFun3 = <A, B, C, S>(
+  fun: (
+    prev: AsyncState<S>
+  ) => (a: OrState<A>, b: OrState<B>, c: OrState<C>) => Promise<S>,
+  options: Options3<A, B, C> = {}
+) => new AsyncFun3(fun, options);
+
+/*********************************************************
  * Last successful state of async state
  * *******************************************************/
 export const useSuccess = <S>(
@@ -183,5 +217,47 @@ export const useFailure = (
 };
 
 /*********************************************************
- * TODO: useAsyncDep(N) with async compute
+ * Dependent state hooks with asynchronous computations
  * *******************************************************/
+export const useAsyncDep = <D, S>(
+  dep: OrState<D>,
+  compute: (prev: AsyncState<S>) => (depState: D) => Promise<S>
+): AndState<AsyncState<S>> => {
+  const deps: [D] = [getState(dep)];
+  const asyncFun = useAsyncFun1<D, S>(compute, { runOnInit: deps });
+  useEffect(() => {
+    asyncFun.call(...deps);
+  }, deps);
+  return andStateRO(asyncFun);
+};
+
+export const useAsyncDep2 = <D1, D2, S>(
+  d1: OrState<D1>,
+  d2: OrState<D2>,
+  compute: (prev: AsyncState<S>) => (d1: D1, d2: D2) => Promise<S>
+): AndState<AsyncState<S>> => {
+  const deps: [D1, D2] = [getState(d1), getState(d2)];
+  const asyncFun = useAsyncFun2<D1, D2, S>(compute, {
+    runOnInit: deps
+  });
+  useEffect(() => {
+    asyncFun.call(...deps);
+  }, deps);
+  return andStateRO(asyncFun);
+};
+
+export const useAsyncDep3 = <D1, D2, D3, S>(
+  d1: OrState<D1>,
+  d2: OrState<D2>,
+  d3: OrState<D3>,
+  compute: (prev: AsyncState<S>) => (d1: D1, d2: D2, d3: D3) => Promise<S>
+): AndState<AsyncState<S>> => {
+  const deps: [D1, D2, D3] = [getState(d1), getState(d2), getState(d3)];
+  const asyncFun = useAsyncFun3<D1, D2, D3, S>(compute, {
+    runOnInit: deps
+  });
+  useEffect(() => {
+    asyncFun.call(...deps);
+  }, deps);
+  return andStateRO(asyncFun);
+};

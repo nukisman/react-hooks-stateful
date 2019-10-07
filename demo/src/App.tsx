@@ -20,9 +20,11 @@ import {
   useAsyncFun0,
   useAsyncFun1,
   useAsyncFun2,
-  Async,
+  AsyncState,
   useSuccess,
-  useFailure
+  useFailure,
+  useAsyncDep,
+  useAsyncDep2
 } from 'react-dep-state';
 
 /** Reusable Width of some type defined later */
@@ -106,12 +108,15 @@ const App: FC = () => {
     asyncFunUnstable,
     new Error('Default Failure')
   );
-  // TODO: useAsyncDep(N) with async compute
-  const asyncDep = useAsyncFun1<string, string>(
-    prev => async (msg: string) => msg + '!',
-    {
-      runOnInit: [lastSuccess.state]
-    }
+  const asyncDep = useAsyncDep<string, string>(
+    name,
+    prev => async (name: string) => (prev.success || '') + name + '!'
+  );
+  const asyncDep2 = useAsyncDep2<string, number, string>(
+    lastSuccess,
+    width,
+    prev => async (name: string, width: number) =>
+      `lastSuccess: ${name}, width: ${width}`
   );
   return (
     <>
@@ -204,23 +209,28 @@ const App: FC = () => {
       Last success: {lastSuccess.state}
       <br />
       Last failure: {lastFailure.state.message}
-      <AsyncView
-        name="asyncDep"
-        async={asyncDep}
-        onClick={() => asyncDep.call('x')}
-      />
+      <AsyncView name="asyncDep" async={asyncDep} />
+      <AsyncView name="asyncDep2" async={asyncDep2} />
     </>
   );
 };
 
 const AsyncView: FC<{
   name: string;
-  async: Async<any>;
-  onClick: () => void;
+  async: Stateful<AsyncState<any>>;
+  onClick?: () => void;
 }> = ({ name, async, onClick }) => {
   return (
     <div>
-      <button onClick={onClick}>Call {name}</button> <br />
+      {onClick ? (
+        <button onClick={onClick}>Call {name}</button>
+      ) : (
+        <>
+          <hr />
+          {name}:
+        </>
+      )}
+      <br />
       Status: {async.state.status}
       <br />
       Success: {async.state.success}
