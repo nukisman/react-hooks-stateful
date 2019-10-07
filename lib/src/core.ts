@@ -37,9 +37,8 @@ export class Writable<S> extends Stateful<S> {
     super(state);
     this._setState = setState;
   }
-  protected updateState(upd: (newState: S) => S) {
+  protected setState(newState: S) {
     // TODO: Test, type and fix re.set() for class instances
-    const newState = upd(this.state);
     const reallyNewState: S = re.set(this.state, newState);
     // const change = {
     //   reallyNewState,
@@ -50,6 +49,9 @@ export class Writable<S> extends Stateful<S> {
       this._setState(reallyNewState);
       // this._state = reallyNewState;
     } //else console.log('Not changed:', change);
+  }
+  protected updateState(upd: (newState: S) => S) {
+    this.setState(upd(this.state));
   }
 }
 

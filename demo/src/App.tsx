@@ -15,7 +15,11 @@ import {
   useJoin,
   useSub,
   useDiv,
-  Input
+  Input,
+  useAsync,
+  useAsyncFun0,
+  useAsyncFun1,
+  useAsyncFun2
 } from 'react-dep-state';
 
 /** Reusable Width of some type defined later */
@@ -23,6 +27,10 @@ const useWidth = reuseProp('width');
 
 /** Reusable Width of number */
 const useWidthOfNumber = reusePropOf('width')<number>();
+const asyncRandom = async () => 'Random: ' + Math.random();
+const asyncInc = prev => async () => (prev.success || 0) + 1;
+const asyncInc1 = prev => async a => (prev.success || 0) + a;
+const asyncInc2 = prev => async (a, b) => (prev.success || 0) + a + b;
 
 const App: FC = () => {
   const name = useInput('AlexZ');
@@ -73,6 +81,10 @@ const App: FC = () => {
   const sub = useSub(width_____, height, width_____, width, 33);
   const prod = useProd(width_____, height, width_____, width, 33);
   const div = useDiv(width_____, height, width_____, width, 33);
+  const async = useAsync<string>();
+  const asyncFun0 = useAsyncFun0(asyncInc, { runOnInit: true });
+  const asyncFun1 = useAsyncFun1(asyncInc1, { runOnInit: [0] });
+  const asyncFun2 = useAsyncFun2(asyncInc2, { runOnInit: [0, 0] });
   return (
     <>
       <h4>Example: react-dep-state</h4>
@@ -135,6 +147,23 @@ const App: FC = () => {
       Map: [{mapArray.join(', ')}]
       <br />
       Join: ({joinArray.state})
+      <hr />
+      <button onClick={() => async.await(asyncRandom())}>
+        Await
+      </button> Async: {async.state.success}
+      <br />
+      <button onClick={() => asyncFun0.call()}>Call 0</button> AsyncFun:{' '}
+      {asyncFun0.state.success}
+      <br />
+      <button onClick={() => asyncFun1.call(width_____.state)}>
+        Call 1
+      </button>{' '}
+      AsyncFun: {asyncFun1.state.success}
+      <br />
+      <button onClick={() => asyncFun2.call(size.height, width_____.state)}>
+        Call 2
+      </button>{' '}
+      AsyncFun: {asyncFun2.state.success}
     </>
   );
 };
