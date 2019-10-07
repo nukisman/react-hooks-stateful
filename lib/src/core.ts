@@ -98,7 +98,7 @@ export const andState = <S>(st: Stateful<S>): AndState<S> => {
   return new Proxy<Stateful<S>>(st, {
     get(target: Stateful<S>, name: string) {
       if (target[name]) return target[name];
-      else return target.state[name];
+      else return target.state && target.state[name];
     },
     getOwnPropertyDescriptor(
       target: Stateful<S>,
