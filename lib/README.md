@@ -1,30 +1,22 @@
-# react-dep-state
+# react-hooks-stateful
 
 > 
 
-[![NPM](https://img.shields.io/npm/v/react-dep-state.svg)](https://www.npmjs.com/package/react-dep-state) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+[![NPM](https://img.shields.io/npm/v/react-hooks-stateful.svg)](https://www.npmjs.com/package/react-hooks-stateful) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 ## Install
 
 ```bash
-npm install --save react-dep-state
+yarn add react-hooks-stateful
+```
+or
+```bash
+npm install --save react-hooks-stateful
 ```
 
 ## Usage
 
-```tsx
-import * as React from 'react'
-
-import MyComponent from 'react-dep-state'
-
-class Example extends React.Component {
-  render () {
-    return (
-      <MyComponent />
-    )
-  }
-}
-```
+See examples in [react-hooks-stateful/demo](https://github.com/nukisman/react-hooks-stateful/demo)
 
 ## License
 

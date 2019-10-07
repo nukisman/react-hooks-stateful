@@ -27,7 +27,7 @@ import {
   useAsyncDep2,
   useMouse,
   MouseEventType
-} from 'react-dep-state';
+} from 'react-hooks-stateful';
 
 /** Reusable Width of some type defined later */
 const useWidth = reuseProp('width');
@@ -123,7 +123,7 @@ const App: FC = () => {
   );
   return (
     <>
-      <h4>Example: react-dep-state</h4>
+      <h4>Example: react-hooks-stateful</h4>
       ReadOnly: {readOnly.state}
       <br />
       <button onClick={writeReadOnly}>Write ReadOnly Stateful !</button>

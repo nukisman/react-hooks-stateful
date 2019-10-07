@@ -1,10 +1,10 @@
 {
-  "name": "react-dep-state",
+  "name": "react-hooks-stateful",
   "version": "1.0.0",
   "description": "",
   "author": "nukisman",
   "license": "MIT",
-  "repository": "nukisman/react-dep-state",
+  "repository": "nukisman/react-hooks-stateful",
   "main": "build/index.js",
   "module": "build/index.esm.js",
   "engines": {

@@ -4,7 +4,6 @@ import * as re from 'reupdate';
 
 // TODO: TypeScript bug issue: plain object as class instance
 
-// TODO: async.ts: useAsync(n), useLastSuccess, useLastError
 // todo?: entity.ts: useEntity
 
 export type Lazy<S> = () => S;

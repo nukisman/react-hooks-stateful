@@ -8011,7 +8011,7 @@ react-app-polyfill@^1.0.3:
     regenerator-runtime "0.13.3"
     whatwg-fetch "3.0.0"
 
-"react-dep-state@link:..":
+"react-hooks-stateful@link:..":
   version "0.0.0"
   uid ""
 

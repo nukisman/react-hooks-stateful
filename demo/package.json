@@ -1,6 +1,6 @@
 {
-  "name": "react-dep-state-example",
-  "homepage": "https://nukisman.github.io/react-dep-state",
+  "name": "react-hooks-stateful-demo",
+  "homepage": "https://nukisman.github.io/react-hooks-stateful",
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "react-dep-state": "^1.0.0"
+    "react-hooks-stateful": "^1.0.0"
   },
   "peerDependencies": {},
   "devDependencies": {

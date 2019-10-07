@@ -1,6 +1,6 @@
 {
-  "short_name": "react-dep-state",
-  "name": "react-dep-state",
+  "short_name": "react-hooks-stateful",
+  "name": "react-hooks-stateful",
   "start_url": "./index.html",
   "display": "standalone",
   "theme_color": "#000000",
