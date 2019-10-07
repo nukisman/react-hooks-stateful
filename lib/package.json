@@ -1,6 +1,6 @@
 {
   "name": "react-hooks-pure",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "React Hooks for pure, dependent, async state management with TypeScript safety",
   "keywords": [
     "react",
