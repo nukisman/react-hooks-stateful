@@ -24,7 +24,9 @@ import {
   useSuccess,
   useFailure,
   useAsyncDep,
-  useAsyncDep2
+  useAsyncDep2,
+  useMouse,
+  MouseEventType
 } from 'react-dep-state';
 
 /** Reusable Width of some type defined later */
@@ -50,6 +52,7 @@ export const delay = (ms: number) =>
   new Promise(resolve => setTimeout(resolve, ms));
 
 const App: FC = () => {
+  const mouse = useMouse(MouseEventType.Click);
   const name = useInput('AlexZ');
   const size = useWindowSize();
   const updateName = (e: ChangeEvent<HTMLInputElement>) =>
@@ -126,6 +129,11 @@ const App: FC = () => {
       <button onClick={writeReadOnly}>Write ReadOnly Stateful !</button>
       <hr />
       <input defaultValue={name.state} onChange={updateName} />
+      {mouse.state && (
+        <div>
+          Mouse: {mouse.state.clientX}, {mouse.state.clientY}
+        </div>
+      )}
       <div>name.state: {name.state}</div>
       <br />
       <div>

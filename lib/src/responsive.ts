@@ -1,10 +1,9 @@
 /** Created by Alexander Nuikin <nukisman@gmail.com> */
 import { useEffect } from 'react';
 import { useDep2 } from './dep';
-import { AndState, andStateRO, OrState, useInput } from './core';
+import { AndState, andStateRO, getState, OrState, useInput } from './core';
 import { useLte } from './number';
-
-// TODO: useMouse
+import { Maybe } from './maybe';
 
 export type Size = { width: number; height: number };
 export const getSize = (): Size => ({
@@ -13,13 +12,14 @@ export const getSize = (): Size => ({
 });
 
 export const useWindowSize: () => AndState<Size> = () => {
+  const et = 'resize';
   const size = useInput(getSize);
   useEffect(() => {
     const listen = () => {
       size.set(getSize());
     };
-    window.addEventListener('resize', listen);
-    return () => window.removeEventListener('resize', listen);
+    window.addEventListener(et, listen);
+    return () => window.removeEventListener(et, listen);
   }, []);
   return andStateRO(size);
 };
@@ -43,4 +43,32 @@ export const useDepWidthLevels: (
       return flags;
     }
   );
+};
+
+export enum MouseEventType {
+  Click = 'click',
+  DblClick = 'dblclick',
+  ContextMenu = 'contextmenu',
+  MouseMove = 'mousemove',
+  MouseUp = 'mouseup',
+  MouseDown = 'mousedown',
+  MouseEnter = 'mouseenter',
+  MouseLeave = 'mouseleave',
+  MouseOut = 'mouseout',
+  MouseOver = 'mouseover'
+}
+
+export const useMouse = (
+  eventType: OrState<MouseEventType>
+): AndState<Maybe<MouseEvent>> => {
+  const et = getState(eventType);
+  const input = useInput<Maybe<MouseEvent>>(undefined);
+  useEffect(() => {
+    const listen = (event: MouseEvent) => {
+      input.set(event);
+    };
+    window.addEventListener(et, listen);
+    return () => window.removeEventListener(et, listen);
+  }, []);
+  return andStateRO(input);
 };
