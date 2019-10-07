@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "react-hooks-pure": "^1.0.3"
+    "react-hooks-pure": "^2.0.0"
   },
   "peerDependencies": {},
   "devDependencies": {
