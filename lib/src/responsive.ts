@@ -11,16 +11,26 @@ export const getSize = (): Size => ({
   height: window.innerHeight
 });
 
-export const useWindowSize: () => AndState<Size> = () => {
-  const et = 'resize';
-  const size = useInput(getSize);
+export const useWindowListener = (
+  type: string,
+  listener: EventListenerOrEventListenerObject,
+  options?: boolean | AddEventListenerOptions
+) => {
   useEffect(() => {
-    const listen = () => {
-      size.set(getSize());
-    };
-    window.addEventListener(et, listen);
-    return () => window.removeEventListener(et, listen);
+    window.addEventListener(type, listener);
+    return () => window.removeEventListener(type, listener);
   }, []);
+};
+
+export const useStorageListener = (listener: (event: StorageEvent) => void) => {
+  useWindowListener('storage', listener as EventListener);
+};
+
+export const useWindowSize: () => AndState<Size> = () => {
+  const size = useInput(getSize);
+  useWindowListener('resize', () => {
+    size.set(getSize());
+  });
   return andStateRO(size);
 };
 
@@ -63,12 +73,8 @@ export const useMouse = (
 ): AndState<Maybe<MouseEvent>> => {
   const et = getState(eventType);
   const input = useInput<Maybe<MouseEvent>>(undefined);
-  useEffect(() => {
-    const listen = (event: MouseEvent) => {
-      input.set(event);
-    };
-    window.addEventListener(et, listen);
-    return () => window.removeEventListener(et, listen);
-  }, []);
+  useWindowListener(et, (event: MouseEvent) => {
+    input.set(event);
+  });
   return andStateRO(input);
 };

@@ -8,5 +8,6 @@ export * from './number';
 export * from './object';
 export * from './array';
 export * from './string';
+export * from './time';
 export * from './async';
 export * from './responsive';
