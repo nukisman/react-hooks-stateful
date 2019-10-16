@@ -1,13 +1,9 @@
 /.idea
 
 /demo/node_modules
-/demo/node_modules/react-hooks-pure
+/demo/yarn-error.log
 /demo/build
 
-/lib/build
 /lib/node_modules
-/lib/main
-/lib/responsive
-/lib/operator
-/lib/*.d.ts
 /lib/yarn-error.log
+/lib/build
