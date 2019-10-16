@@ -6,13 +6,22 @@
 
 ## Install
 
+Peer dependencies:
+```bash
+yarn add react react-dom
+```
+
+React TypesScript support as devDependencies:
+```bash
+yarn add --dev @types/react @types/react-dom
+```
+
+The library itself:
 ```bash
 yarn add react-hooks-pure
 ```
-or
-```bash
-npm install --save react-hooks-pure
-```
+
+You can also use `npm` instead of `yarn`.
 
 ## Usage
 

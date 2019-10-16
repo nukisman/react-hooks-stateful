@@ -8,10 +8,11 @@
     "state",
     "pure",
     "dependent",
-    "async"
+    "async",
+    "typescript"
   ],
   "homepage": "https://github.com/nukisman/react-hooks-pure",
-  "readme": "../RE",
+  "readme": "./README.md",
   "author": "nukisman (Alexander Nuikin)",
   "license": "MIT",
   "repository": "nukisman/react-hooks-pure",
