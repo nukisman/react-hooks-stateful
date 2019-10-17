@@ -1,4 +1,4 @@
-import { AndState, OrState, Writable } from './core';
+import { AndState, Initial, OrState, Writable } from './core';
 import { useDep2 } from './dep';
 
 export const reuseProp = <K extends string>(name: OrState<K>) => <
@@ -50,7 +50,16 @@ export const useMethod = <T, A, R>(
 /*********************************************************
  * Other
  * *******************************************************/
-export class Values<V, T extends { [key: string]: V }> extends Writable<T> {
+export type Dict<V> = {
+  [key: string]: V;
+};
+export class Values<
+  V,
+  T extends { [key: string]: V } = Dict<V>
+> extends Writable<T> {
+  constructor(initial: Initial<T>) {
+    super(initial);
+  }
   public setValue(key: keyof T, value: V) {
     this.updateState(state => ({ ...state, [key]: value }));
   }
