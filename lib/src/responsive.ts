@@ -73,8 +73,8 @@ export const useMouse = (
 ): AndState<Maybe<MouseEvent>> => {
   const et = getState(eventType);
   const input = useInput<Maybe<MouseEvent>>(undefined);
-  useWindowListener(et, (event: MouseEvent) => {
+  useWindowListener(et, ((event: MouseEvent) => {
     input.set(event);
-  });
+  }) as EventListener);
   return andStateRO(input);
 };
