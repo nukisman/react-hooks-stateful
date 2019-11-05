@@ -11,19 +11,16 @@ export const useChange = <S, C>(
 ): AndState<C> => {
   const [{ change }, dispatch] = useReducer(
     (prev: ChangeState<S, C>, state: S): ChangeState<S, C> => {
-      console.log('reducer', { prev, state });
       if (prev.state === undefined) {
         return { state, change: prev.change };
       } else {
         const change = compute(prev.state, state);
         if (change === undefined) return prev;
-        else {
-          console.log('change', change);
+        else
           return {
             state,
             change
           };
-        }
       }
     },
     { state: undefined, change: getState(initial) }
