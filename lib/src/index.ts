@@ -1,6 +1,7 @@
 export * from './core';
 export * from './debug';
 export * from './dep';
+export * from './change';
 export * from './any';
 export * from './maybe';
 export * from './boolean';
