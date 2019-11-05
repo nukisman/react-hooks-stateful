@@ -31,6 +31,19 @@ export const useWindowSize: () => AndState<Size> = () => {
   useWindowListener('resize', () => {
     size.set(getSize());
   });
+  // TODO: Update window size on page zooming and device rotation
+  // useWindowListener('wheel', () => {
+  //   const s = getSize();
+  //   console.log(`window ${s.width} x ${s.height}`);
+  //   size.set(s);
+  // });
+  // useWindowListener('orientationchange', e => {
+  //   console.log(window.screen.orientation);
+  //   console.log(`screen ${window.screen.width} x ${window.screen.height}`);
+  //   const s = getSize();
+  //   console.log(`window ${s.width} x ${s.height}`);
+  //   size.set(window.screen);
+  // });
   return andStateRO(size);
 };
 
