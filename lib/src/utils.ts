@@ -1,4 +1,5 @@
 /* Created by Alexander Nuikin (nukisman@gmail.com). */
+// TODO: package: utilities: debug, random, promise, strings, arrays, functions, types
 export type Int = number;
 export type Lazy<T> = () => T;
 
