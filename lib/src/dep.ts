@@ -8,6 +8,7 @@ import {
   useInput
 } from './core';
 
+// TODO?: Use useEffect instead of useMemo
 /*********************************************************
  * Dependent state hooks
  * *******************************************************/
